@@ -148,6 +148,33 @@ _MERCADOS_REMOTO = {
     "india": "Índia",
     "brazil": "Brasil",
     "brasil": "Brasil",
+    # Estados brasileiros para casar com "Remote - Santa Catarina", "Remoto (Minas Gerais)", etc.
+    "sao paulo": "Brasil",
+    "rio de janeiro": "Brasil",
+    "minas gerais": "Brasil",
+    "bahia": "Brasil",
+    "parana": "Brasil",
+    "rio grande do sul": "Brasil",
+    "pernambuco": "Brasil",
+    "ceara": "Brasil",
+    "santa catarina": "Brasil",
+    "goias": "Brasil",
+    "maranhao": "Brasil",
+    "espirito santo": "Brasil",
+    "paraiba": "Brasil",
+    "amazonas": "Brasil",
+    "mato grosso": "Brasil",
+    "mato grosso do sul": "Brasil",
+    "rio grande do norte": "Brasil",
+    "piaui": "Brasil",
+    "alagoas": "Brasil",
+    "distrito federal": "Brasil",
+    "sergipe": "Brasil",
+    "rondonia": "Brasil",
+    "tocantins": "Brasil",
+    "acre": "Brasil",
+    "amapa": "Brasil",
+    "roraima": "Brasil",
     "portugal": "Portugal",
     "spain": "Espanha",
     "espanha": "Espanha",
@@ -489,6 +516,8 @@ _SIGLAS_UF_AMBIGUAS = {"al", "ma", "mt", "ms", "pa", "sc"}
 # e inventar regra por contagem de palavras arriscaria barrar "Recife PE"
 # ou "vaga em Natal". Preferir o falso positivo raro ao falso negativo.
 _UF_DA_CIDADE = {
+    "sao jose do rio preto": "sp",
+    "sao paulo": "sp",
     "campina grande": "pb",
     "joao pessoa": "pb",
     "recife": "pe",
@@ -524,17 +553,89 @@ def _cidade_confere(cidade_norm: str, local_norm: str) -> bool:
     uf_texto = _uf_declarada(local_norm)
     return uf_texto is None or uf_texto == uf_esperada
 
-# Capital de cada estado brasileiro (+DF), normalizado — usado só pra
-# desambiguar as 6 siglas acima. Cobre exatamente o formato que o LinkedIn
-# mostra pra vaga remota brasileira ("Remoto (Capital, UF)"), sem precisar
-# de uma base de cidade completa.
-_CAPITAIS_BRASIL = {
+# Cidades e capitais de todos os estados brasileiros, normalizadas.
+# Cobre o formato que o LinkedIn e outras fontes mostram ("Remoto (Cidade, UF)")
+# para desambiguação das UFs e reconhecimento de escopo Brasil.
+_CIDADES_BRASIL = {
+    # Capitais de todos os 26 estados + DF
     "rio branco", "maceio", "macapa", "manaus", "salvador", "fortaleza",
     "brasilia", "vitoria", "goiania", "sao luis", "cuiaba", "campo grande",
     "belo horizonte", "belem", "joao pessoa", "curitiba", "recife",
     "teresina", "rio de janeiro", "natal", "porto alegre", "porto velho",
     "boa vista", "florianopolis", "sao paulo", "aracaju", "palmas",
+    # Santa Catarina (SC)
+    "joinville", "blumenau", "itajaí", "itajai", "chapeco", "chapecó",
+    "balneario camboriu", "balneário camboriú", "criciuma", "criciúma",
+    "tubarao", "tubarão", "lages", "brusque", "jaragua do sul", "jaraguá do sul",
+    "palhoca", "palhoça", "sao jose", "são josé", "gaspar", "camboriu", "camboriú",
+    # São Paulo (SP)
+    "campinas", "sao jose dos campos", "são josé dos campos", "ribeirao preto",
+    "ribeirão preto", "sorocaba", "santos", "sao jose do rio preto", "são josé do rio preto",
+    "piracicaba", "bauru", "jundiai", "jundiaí", "franca", "taubate", "taubaté",
+    "barueri", "osasco", "santo andre", "santo andré", "sao bernardo do campo",
+    "são bernardo do campo", "guarulhos", "indaiatuba", "americana", "araraquara",
+    "sao carlos", "são carlos", "limeira", "marilia", "marília", "presidente prudente",
+    "valinhos", "vinhedo", "hortolandia", "hortolândia", "suzano", "taboao da serra",
+    # Rio de Janeiro (RJ)
+    "niteroi", "niterói", "petropolis", "petrópolis", "volta redonda", "duque de caxias",
+    "nova iguacu", "nova iguaçu", "campos dos goytacazes", "macae", "macaé", "teresopolis",
+    # Minas Gerais (MG)
+    "uberlandia", "uberlândia", "juiz de fora", "contagem", "betim", "montes claros",
+    "uberaba", "governador valadares", "ipatinga", "pocos de caldas", "poços de caldas",
+    "sete lagoas", "divinopolis", "divinópolis", "santa rita do sapucai", "santa rita do sapucaí",
+    "pouso alegre", "varginha", "itauna", "itaúna", "patos de minas",
+    # Paraná (PR)
+    "londrina", "maringa", "maringá", "ponta grossa", "cascavel", "foz do iguacu",
+    "foz do iguaçu", "sao jose dos pinhais", "são josé dos pinhais", "colombo", "guarapuava",
+    "paranagua", "paranaguá", "toledo", "apucarana", "pinhais", "araucaria", "araucária",
+    # Rio Grande do Sul (RS)
+    "caxias do sul", "canoas", "pelotas", "santa maria", "gravatai", "gravataí",
+    "novo hamburgo", "sao leopoldo", "são leopoldo", "passo fundo", "rio grande",
+    "bento goncalves", "bento gonçalves", "erechim", "lajeado", "santa cruz do sul",
+    # Bahia (BA)
+    "feira de santana", "vitoria da conquista", "vitória da conquista", "camacari",
+    "camaçari", "itabuna", "juazeiro", "ilheus", "ilhéus", "lauro de freitas", "jequie", "jequié",
+    # Ceará (CE)
+    "caucaia", "juazeiro do norte", "maracanau", "maracanaú", "sobral", "crato", "itapipoca",
+    # Pernambuco (PE)
+    "jaboatao dos guararapes", "jaboatão dos guararapes", "olinda", "caruaru", "petrolina",
+    "paulista", "cabo de santo agostinho", "camaragibe", "garanhuns", "vitoria de santo antao",
+    # Goiás (GO)
+    "aparecida de goiania", "aparecida de goiânia", "anapolis", "anápolis", "rio verde",
+    "luziania", "luziânia", "aguas lindas de goias", "águas lindas de goiás", "valparaiso de goias",
+    # Pará (PA)
+    "ananindeua", "santarem", "santarém", "maraba", "marabá", "parauapebas", "castanhal",
+    # Maranhão (MA)
+    "imperatriz", "caxias", "timon", "sao jose de ribamar", "são josé de ribamar",
+    # Paraíba (PB)
+    "campina grande", "santa rita", "patos", "bayeux", "sousa", "cajazeiras",
+    # Rio Grande do Norte (RN)
+    "mossoro", "mossoró", "parnamirim", "sao goncalo do amarante", "são gonçalo do amarante", "caico", "caicó",
+    # Alagoas (AL)
+    "arapiraca", "rio largo", "palmeira dos indios", "palmeira dos índios",
+    # Piauí (PI)
+    "parnaiba", "parnaíba", "picos", "piripiri",
+    # Sergipe (SE)
+    "nossa senhora do socorro", "lagarto", "itabaiana", "sao cristovao", "são cristóvão",
+    # Mato Grosso do Sul (MS)
+    "dourados", "tres lagoas", "três lagoas", "corumba", "corumbá", "ponta pora", "ponta porã",
+    # Mato Grosso (MT)
+    "varzea grande", "várzea grande", "rondonopolis", "rondonópolis", "sinop", "tangara da serra",
+    # Rondônia (RO)
+    "ji-parana", "ji-paraná", "ariquemes", "vilhena", "cacoal",
+    # Espírito Santo (ES)
+    "vila velha", "serra", "cariacica", "cachoeiro de itapemirim", "linhares", "colatina", "sao mateus", "guarapari",
+    # Tocantins (TO)
+    "araguaina", "araguaína", "gurupi", "porto nacional",
+    # Acre (AC)
+    "cruzeiro do sul", "sena madureira",
+    # Amapá (AP)
+    "santana", "laranjal do jari",
+    # Roraima (RR)
+    "rorainopolis", "rorainópolis",
 }
+
+_CAPITAIS_BRASIL = _CIDADES_BRASIL
 
 # MEDIDO: "Monterrey, N.L.", "Cuauhtémoc, CDMX", "León, Gto.", "Ciudad
 # Juárez, Chih.", "Guadalajara, Jal.", "San Luis Potosí, S.L.P." — mesmo
@@ -822,12 +923,12 @@ def extrair_data_publicacao(texto_card: str) -> str:
 # filtrado por senioridade — só é classificado, pra decidir isso na hora de
 # ler a notificação, não em deixar a vaga passar ou não.
 _NIVEIS_SENIORIDADE = [
-    ("Estágio/Trainee", (r"estagi[ao]", r"estagio", r"trainee")),
-    ("Júnior", (r"junior", r"jr\.?")),
-    ("Pleno", (r"pleno", r"pl\.?")),
+    ("Estágio/Trainee", (r"estagi\w*", r"trainee", r"intern(?:ship)?")),
+    ("Júnior", (r"junior", r"jr\.?", r"entry[- ]?level")),
+    ("Pleno", (r"pleno", r"pl\.?", r"mid[- ]?level", r"intermediate")),
     ("Sênior", (r"senior", r"sr\.?", r"sênior")),
-    ("Especialista", (r"especialista", r"specialist")),
-    ("Liderança", (r"coordenador", r"coordenadora", r"gerente", r"manager", r"head")),
+    ("Especialista", (r"especialista", r"specialist", r"staff", r"principal")),
+    ("Liderança", (r"coordenador", r"coordenadora", r"gerente", r"manager", r"head", r"tech lead", r"lead", r"líder técnico", r"lider tecnico")),
 ]
 
 
@@ -854,104 +955,90 @@ def _detectar_senioridade(titulo: str) -> str:
 @dataclass
 class RegrasFiltro:
     """Agrupa as 6 regras que Job.combina_com() usa pra decidir se uma vaga
-    bate ou não. Antes eram 6 parâmetros posicionais soltos, atravessando
-    job.py -> utils/filtro.py -> main.py/main_intl.py — cada regra nova
-    (já foram 6: forte, ambíguo, qualificador de dados, ferramenta,
-    qualificador de cargo, cidade) alongava a lista de posições, e trocar a
-    ordem de dois argumentos do mesmo tipo (duas list[str] quaisquer) não dá
-    erro nenhum, só passa a filtrar errado em silêncio — nada no Python
-    detecta isso, já que todos os parâmetros têm o mesmo tipo. Um objeto
-    único com nome em cada campo elimina esse risco: a ordem da CHAMADA
-    deixa de importar (kwargs/atributos nomeados), e esquecer um campo vira
-    TypeError na hora (dataclass sem default nos campos obrigatórios), não
-    filtro errado descoberto só depois.
-    """
+    bate ou não."""
     keywords_forte: list[str]
     keywords_ambiguo: list[str]
     qualificadores_dados: list[str]
     ferramentas_titulo: list[str]
     qualificadores_cargo: list[str]
     cidades: list[str]
-    # Mercados aceitos pra vaga remota COM escopo geográfico explícito no
-    # texto (ver Job.escopo_remoto/extrair_escopo_remoto). None = não checa
-    # escopo nenhum (aceita qualquer remoto, comportamento de antes desse
-    # campo existir — default seguro pra quem ainda não configurou isso).
-    # Lista vazia é diferente de None: significa "só aceita remoto SEM
-    # escopo declarado", rejeitando todo mercado explícito.
     mercados_remoto_aceitos: list[str] | None = None
-    # MEDIDO: perfil internacional não exigia espanhol/português na vaga em
-    # si — só nos TERMOS de busca (ex: "data analyst spanish speaker"), que
-    # nunca eram checados de novo depois. "Senior Data Analyst"/"Data
-    # Analyst" remoto e sem mercado declarado passava sem nenhuma relação
-    # com o idioma, porque o resultado bateu no termo de busca (que casa
-    # contra o anúncio inteiro, não só o título que a gente guarda) sem que
-    # "spanish"/"portuguese"/"latam" apareça em nada que sobra depois.
-    #
-    # Mesma lógica de keywords_ambiguo (cargo ambíguo só conta com
-    # qualificador junto): quando o escopo já é um país que fala espanhol/
-    # português (ver mercados_remoto_aceitos), o PAÍS é o próprio sinal de
-    # idioma — não precisa achar a palavra no título também. Só entra em
-    # jogo quando a vaga é remota SEM mercado declarado (escopo vazio, não
-    # tem como saber o país), aí sim o título precisa mencionar idioma/
-    # mercado hispanofalante-lusófono explicitamente. None = não checa
-    # (BR não precisa — fonte já é 100% brasileira/portuguesa).
     idiomas_exigidos: list[str] | None = None
 
 
 @dataclass
 class _Avaliacao:
-    """Resultado intermediário de Job._avaliar() — reaproveitado por
-    combina_com() (filtro, decide passa/não passa) e pontuar_relevancia()
-    (score, só ordena o que já passou). Extraído pra um lugar só depois de
-    escopo_rejeitado_por_mercado ter precisado refazer parte da mesma conta
-    separadamente (ver MEDIDO lá) — mais um método calculando a mesma coisa
-    de outro jeito é exatamente o padrão que já causou bug real nesta base
-    (ver extrair_escopo_remoto)."""
     aprovada: bool
     bate_forte: bool
     bate_ambiguo: bool
     bate_ferramenta: bool
     bate_remoto: bool
     escopos: set[str]
-    mercado_confirmado: bool  # escopo bateu explicitamente um mercado aceito
+    mercado_confirmado: bool
     idioma_bateu_titulo: bool
 
 
-# Pesos do score de relevância (pontuar_relevancia, máximo 10) — soma
-# simples, sem aprendizado de máquina: o conjunto de sinais é pequeno (5) e
-# o peso de cada um já é conhecido, não precisa de modelo pra isso. NÃO é
-# filtro — só ordena o que já passou combina_com(). MEDIDO: com ~320
-# vaga/dia aprovada (item 01 do perfil internacional sozinho já passou de
-# 10/dia pra isso), toda vaga chegava com o mesmo destaque no Telegram, a
-# ideal e a tolerável lado a lado sem diferença nenhuma.
+# Pesos do score de relevância (pontuar_relevancia, máximo 10)
 _PESO_CARGO_FORTE = 3
 _PESO_CARGO_AMBIGUO = 2
 _PESO_FERRAMENTA = 2
 _PESO_SENIORIDADE_ALVO = 2
-_PESO_SENIORIDADE_NEUTRA = 1  # título sem nível classificável — não penaliza por falta de informação
-# MEDIDO: classificar sem excluir (ver docstring de _detectar_senioridade)
-# continua certo, mas 0 pontos pra Sênior/Especialista/Liderança tratava
-# "acima do alvo" igual a "não deu pra saber" — as duas ficavam empatadas
-# no score. Medido contra as 780 vagas do jobs.db real: 25% classificam
-# Sênior/Especialista/Liderança, 65% não especificado, só 5,5%
-# Júnior/Pleno — sem separar os dois grupos de zero pontos, a maioria das
-# vagas realmente no alvo não se destacava de vaga acima do alvo nenhuma.
-# Peso negativo simétrico ao bônus (+2/-2): puxa pra baixo sem excluir —
-# a vaga continua passando por combina_com() e notificando (imediata ou no
-# digest), só cai mais no ranking.
-_PESO_SENIORIDADE_ACIMA_DO_ALVO = -2
+_PESO_SENIORIDADE_NEUTRA = 1
+_PESO_SENIORIDADE_ABAIXO_DO_ALVO = -2
 _PESO_MERCADO = 2
-_PESO_MERCADO_NAO_CONFIRMADO = 1  # remota sem mercado declarado no texto (aceita por padrão, sem confirmar)
+_PESO_MERCADO_NAO_CONFIRMADO = 1
 _PESO_IDIOMA = 1
 
-# Prioridade definida pelo usuário: Júnior e Pleno pontuam o teto de
-# senioridade (bônus). Sênior/Especialista/Liderança pontuam negativo
-# (acima do alvo, deságio). Estágio/Trainee fica neutro — nem é o alvo nem
-# é o problema de "vaga tolerável demais" que motivou o deságio (volume
-# desprezível: 0,3% da base). Nada disso é filtro — a vaga ainda notifica,
-# só muda a posição no ranking (imediata vs. digest, topo vs. fundo).
-_NIVEIS_SENIORIDADE_ALVO = {"Júnior", "Pleno"}
-_NIVEIS_SENIORIDADE_ACIMA_DO_ALVO = {"Sênior", "Especialista", "Liderança"}
+# Prioridade do usuário (Engenheiro de Software Sênior | Full Stack):
+# Sênior, Especialista, Liderança e Pleno pontuam no alvo (+2).
+# Júnior e Estágio/Trainee sofrem deságio (-2).
+_NIVEIS_SENIORIDADE_ALVO = {"Sênior", "Especialista", "Liderança", "Pleno"}
+_NIVEIS_SENIORIDADE_ABAIXO_DO_ALVO = {"Estágio/Trainee", "Júnior"}
+
+
+# Padrões que indicam exigência OBRIGATÓRIA de inglês (fluente, avançado, mandatório).
+# NÃO penaliza inglês básico, intermediário, desejável ou diferencial.
+_PADROES_INGLES_OBRIGATORIO = [
+    # Português
+    r"\b(ingles|ingl[eê]s)\s+(fluente|avan[cç]ado|obrigat[oó]rio|exigido|mandat[oó]rio|imprescind[ií]vel|necess[aá]rio)\b",
+    r"\b(flu[eê]ncia|dom[ií]nio|fluente)\s+(em|no|de)?\s*(ingles|ingl[eê]s)\b",
+    r"\b(n[ií]vel\s+de\s+)?(ingles|ingl[eê]s)\s*[:\-–—]\s*(fluente|avan[cç]ado|obrigat[oó]rio|c1|c2)\b",
+    r"\b(ingles|ingl[eê]s)\s+(n[ií]vel\s+)?(c1|c2|avan[cç]ado|fluente)\b",
+    r"\b(bilingual|bil[ií]ngue)\s*[\(\-–—]?\s*(ingles|ingl[eê]s)\b",
+    r"\b(ingles|ingl[eê]s)\s*(bilingual|bil[ií]ngue)\b",
+    # Inglês
+    r"\b(fluent|advanced|mandatory|required|proficient)\s+english\b",
+    r"\benglish\s*[:\-–—]\s*(fluent|advanced|mandatory|required|c1|c2)\b",
+    r"\benglish\s+(fluent|advanced|mandatory|required|proficiency|proficient|speaker|speaking)\b",
+    r"\bfluent\s+in\s+english\b",
+    r"\bproficient\s+in\s+english\b",
+    r"\bmust\s+speak\s+english\b",
+    r"\bmust\s+be\s+fluent\s+in\s+english\b",
+    r"\benglish\s+is\s+(a\s+must|mandatory|required)\b",
+    r"\b(c1|c2)\s+english\b",
+    r"\benglish\s+(c1|c2)\b",
+    # Espanhol
+    r"\b(ingles|ingl[eé]s)\s+(avanzado|fluido|requerido|obligatorio|imprescindible|necesario)\b",
+    r"\b(dominio|fluidez)\s+(de|del|en)?\s*(ingles|ingl[eé]s)\b",
+    r"\b(bilingue|bilingüe)\s*[\(\-–—]?\s*(ingles|ingl[eé]s)\b",
+    r"\b(ingles|ingl[eé]s)\s*(bilingue|bilingüe)\b",
+    r"\b(hablante\s+de\s+ingles|hablante\s+de\s+ingl[eé]s)\b",
+]
+
+_REGEX_INGLES_OBRIGATORIO = re.compile(
+    "|".join(f"(?:{p})" for p in _PADROES_INGLES_OBRIGATORIO),
+    re.IGNORECASE,
+)
+
+
+def exige_ingles_obrigatorio(texto: str) -> bool:
+    """Verifica se o texto (título, descrição ou card) exige inglês
+    de forma obrigatória (fluente, avançado, mandatório).
+    Não penaliza inglês básico, intermediário ou desejável."""
+    if not texto:
+        return False
+    texto_norm = _normalizar(texto)
+    return _REGEX_INGLES_OBRIGATORIO.search(texto_norm) is not None
 
 
 @dataclass
@@ -961,27 +1048,12 @@ class Job:
     local: str
     link: str
     site: str
-    # Data anunciada pela FONTE (não a data em que o JobRadar achou a vaga —
-    # essa já existe em vagas_vistas.encontrada_em). Sem isso não dá pra
-    # medir latência real (quanto tempo entre a vaga ser publicada e o
-    # JobRadar notificar) nem priorizar vaga recente na notificação. Formato
-    # livre (string), porque cada site anuncia diferente — data absoluta
-    # ("11/08", "11 de agosto de 2026"), timestamp ISO (Trampos), ou texto
-    # relativo ("Há 4 meses", "Contratando agora"). Normalizar tudo pra um
-    # formato único exigiria parser por site (relativo→absoluto), fora do
-    # escopo agora — string crua já é suficiente pra exibir na notificação e
-    # é o que a fonte realmente disse. "" quando o site não expõe a data.
     publicado_em: str = ""
-    # Modalidade (Remoto/Híbrido/Presencial) como campo PRÓPRIO, preenchido
-    # pelo scraper na hora da extração. Antes vivia embutida dentro do texto
-    # de `local` (ex: "São Paulo - SP (Remoto)") e era redetectada por
-    # substring toda vez que combina_com() rodava — inclusive mais de uma
-    # vez pra mesma vaga, quando o pipeline internacional roda a mesma lista
-    # de vagas contra CIDADES_INTL e depois CIDADES_EUROPA_IBERICA. Detectar
-    # uma vez, na fonte, e guardar aqui elimina o retrabalho e mantém
-    # `local` só com informação de localização de verdade. Valores usados:
-    # "Remoto", "Híbrido", "Presencial", ou "" quando a fonte não expõe.
     modalidade: str = ""
+    escopo_indefinido: bool = False
+    descricao: str = ""
+    relevancia: int = 0
+    motivo: str = ""
     # MEDIDO: WeWorkRemotelyIntlScraper preenche `local` com a SEDE da
     # empresa (".new-listing__company-headquarters"), não o mercado onde a
     # vaga contrata — o site é 100% remoto por definição, sede não diz nada
@@ -1144,6 +1216,19 @@ class Job:
         """Faz a conta completa uma vez só — combina_com() e
         pontuar_relevancia() leem o mesmo resultado, em vez de cada um
         recalcular por conta própria (ver MEDIDO em _Avaliacao)."""
+        # Rejeita imediatamente vagas que pedem inglês obrigatório
+        if exige_ingles_obrigatorio(self.titulo) or exige_ingles_obrigatorio(self.descricao):
+            return _Avaliacao(
+                aprovada=False,
+                bate_forte=False,
+                bate_ambiguo=False,
+                bate_ferramenta=False,
+                bate_remoto=False,
+                escopos=set(),
+                mercado_confirmado=False,
+                idioma_bateu_titulo=False,
+            )
+
         titulo_norm = _normalizar(self.titulo)
         local_norm = _normalizar(self.local)
         modalidade_norm = _normalizar(self.modalidade)
@@ -1295,12 +1380,12 @@ class Job:
         nivel = self.senioridade
         if nivel in _NIVEIS_SENIORIDADE_ALVO:
             pontos_senioridade = _PESO_SENIORIDADE_ALVO
-        elif nivel in _NIVEIS_SENIORIDADE_ACIMA_DO_ALVO:
-            pontos_senioridade = _PESO_SENIORIDADE_ACIMA_DO_ALVO
+        elif nivel in _NIVEIS_SENIORIDADE_ABAIXO_DO_ALVO:
+            pontos_senioridade = _PESO_SENIORIDADE_ABAIXO_DO_ALVO
         elif nivel == "Não especificado" or nivel.startswith("Nível "):
             pontos_senioridade = _PESO_SENIORIDADE_NEUTRA
         else:
-            pontos_senioridade = 0  # Estágio/Trainee — nem alvo nem acima, neutro-baixo
+            pontos_senioridade = 0
 
         if not av.bate_remoto or av.mercado_confirmado:
             pontos_mercado = _PESO_MERCADO

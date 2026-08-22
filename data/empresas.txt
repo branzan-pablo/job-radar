@@ -1,0 +1,13 @@
+# Lista de empresas para envio de currículo
+# Formato: NOME DA EMPRESA;email@empresa.com
+# Linhas que começam com # são ignoradas
+#
+# Exemplo:
+# Empresa Exemplo;rh@empresa-exemplo.com
+# Tech Solutions;contato@techsolutions.com.br
+
+# ============================================================
+# Adicione suas empresas abaixo:
+# ============================================================
+
+# Empresa Exemplo;rh@empresa.com

@@ -14,92 +14,107 @@ from core.config import TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID, DB_PATH, CIDADES_E
 # Cargo em múltiplos idiomas — vaga internacional pode ter o anúncio escrito
 # em inglês, português ou espanhol, dependendo de quem contratou.
 KEYWORDS_INTL = [
-    "Data Analyst",
-    "Business Intelligence",
-    "BI Analyst",
-    "Data Analytics",
-    "Data Specialist",
-    "Analista de Dados",
-    "Business Analyst",
+    # Inglês
+    "Frontend Developer",
+    "Front-End Developer",
+    "Frontend Engineer",
+    "Front-End Engineer",
+    "Senior Frontend Developer",
+    "Senior Frontend Engineer",
+    "Senior Front-End Developer",
+    "Senior Front-End Engineer",
+    "Staff Frontend Engineer",
+    "Principal Frontend Engineer",
+    "Frontend Lead",
+    "Tech Lead Frontend",
+    "Full Stack Developer",
+    "Fullstack Developer",
+    "Full Stack Engineer",
+    "Fullstack Engineer",
+    "Senior Full Stack Developer",
+    "Senior Full Stack Engineer",
+    "Senior Fullstack Developer",
+    "Senior Fullstack Engineer",
+    "Tech Lead Full Stack",
+    "Software Engineer",
+    "Senior Software Engineer",
+    "Software Developer",
+    "Senior Software Developer",
+    "Angular Developer",
+    "React Developer",
+    "Vue Developer",
+    "Next.js Developer",
+    "Node.js Developer",
+    "TypeScript Developer",
+    ".NET Developer",
+    "C# Developer",
+    "Web Developer",
     # Nomenclatura em espanhol
-    "Analista de Datos",
-    "Analítica de Datos",
-    "Analista de Inteligencia de Negocios",
-    "Especialista en Datos",
-    "Analista de Business Intelligence",
-    "Analista de Reportes",
-    # Eixo separado: Data Annotation / AI Evaluator — não é análise de
-    # dados, é rotular/avaliar dado pra treinar IA, mas é um nicho remoto
-    # que contrata muito por idioma (PT-BR/ES) e paga em dólar, então entra
-    # como categoria própria de cargo, não mistura com as de análise.
-    "Data Annotator",
-    "Data Annotation",
-    "AI Evaluator",
-    "AI Trainer",
-    "Data Labeler",
-    "Search Quality Rater",
+    "Desarrollador Frontend",
+    "Desarrolladora Frontend",
+    "Desarrollador Front-End",
+    "Ingeniero Frontend",
+    "Ingeniero Front-End",
+    "Desarrollador Full Stack",
+    "Desarrollador Fullstack",
+    "Ingeniero Full Stack",
+    "Ingeniero Fullstack",
+    "Ingeniero de Software",
+    "Desarrollador de Software",
+    "Desarrollador Angular",
+    "Desarrollador React",
+    "Desarrollador .NET",
+    "Desarrollador Node",
+    "Especialista Frontend",
+    "Líder Técnico Frontend",
+    # Nomenclatura em português
+    "Desenvolvedor Front-End",
+    "Desenvolvedor Frontend",
+    "Desenvolvedor Full Stack",
+    "Desenvolvedor Fullstack",
+    "Engenheiro de Software",
+    "Desenvolvedor de Software",
 ]
 
 # Termos de busca: cargo + sinal de idioma (português/espanhol/bilíngue) ou
-# +sinal de mercado (LATAM, Spanish Market). Não faz sentido buscar só
-# "data analyst" sozinho aqui — isso é o mundo inteiro sem filtro nenhum de
-# idioma, a maioria fora do nosso alcance.
+# +sinal de mercado (LATAM, Spanish Market).
 TERMOS_BUSCA_INTL = [
-    "data analyst spanish speaker",
-    "data analyst spanish speaking",
-    "data analyst portuguese speaker",
-    "data analyst portuguese speaking",
-    "bilingual data analyst spanish",
-    "bilingual data analyst portuguese",
-    "business intelligence spanish speaker",
-    "business intelligence spanish speaking",
-    "business intelligence portuguese speaker",
-    "business intelligence portuguese speaking",
-    "remote data analyst latam",
-    "remote data analyst latin america",
-    "data analyst spanish market",
-    "business intelligence spanish markets",
-    "analista de datos remoto",
-    # MEDIDO ao vivo: vaga real ("Business Analyst (Colombia) - Remote",
-    # Connect Tech+Talent) aparece em location=Colombia&f_WT=2 pro termo
-    # bare "business analyst" — testei "spanish speaker", "business
-    # intelligence spanish speaker", "remote data analyst latin america" e
-    # "latam" contra a mesma vaga, location e filtro remoto: nenhum achou
-    # (o anúncio não repete nenhuma dessas frases). O comentário original
-    # lá em cima ("não faz sentido buscar só 'data analyst' sozinho, é o
-    # mundo inteiro sem idioma") não vale AQUI: todo termo desta lista já
-    # roda escopado por país (LOCATIONS_INTL) + remoto (f_WT=2) — nunca é
-    # busca global. E o filtro de idioma pós-busca (RegrasFiltro.
-    # idiomas_exigidos) só entra em jogo quando a vaga NÃO declara mercado
-    # nenhum no texto — quando o local já é um país aceito (ex: Colômbia),
-    # o PAÍS é o sinal, dispensa achar "spanish"/"portuguese" no título
-    # (mesma regra que já vale pro resto do filtro, ver job.py). Termo de
-    # cargo puro, escopado por país aceito, é seguro e fecha o vazamento:
-    # KEYWORDS_INTL aprova "Business Analyst"/"Data Analyst"/"Business
-    # Intelligence" como cargo forte, mas nenhum dos dois primeiros nunca
-    # era BUSCADO sozinho — só entravam por acidente, dentro de uma frase
-    # combinada.
-    "business analyst",
-    "data analyst",
-    "business intelligence",
-    # Eixo Data Annotation / AI Evaluator
-    "data annotation spanish speaker",
-    "data annotation portuguese speaker",
-    "ai evaluator spanish",
-    "ai evaluator portuguese",
-    "ai trainer portuguese speaker",
-    "ai trainer spanish speaker",
-    "remote data annotator latam",
-    # Termos "soltos" (idioma/mercado sem cargo emparelhado na própria
-    # busca) — diferente dos de cima, que sempre combinam cargo+idioma numa
-    # frase só. MEDIDO: zero ocorrência de "Spanish"/"Español"/"LATAM" como
-    # termo próprio no projeto — toda vaga que anuncia a vaga com o idioma
-    # em destaque ("Spanish Speaker — Data Analytics Role", "LATAM Remote
-    # Team") e não bate exatamente numa das frases combinadas acima ficava
-    # invisível pra busca. Não é o mesmo risco do comentário lá em cima
-    # (buscar só "data analyst" sozinho, sem NENHUM filtro de idioma) — aqui
-    # é o oposto, idioma sem cargo na busca, e o cargo continua sendo
-    # exigido depois por KEYWORDS_INTL antes de qualquer notificação.
+    "frontend developer spanish speaker",
+    "frontend developer spanish speaking",
+    "frontend developer portuguese speaker",
+    "frontend developer portuguese speaking",
+    "full stack developer spanish speaker",
+    "full stack developer spanish speaking",
+    "full stack developer portuguese speaker",
+    "full stack developer portuguese speaking",
+    "software engineer spanish speaker",
+    "software engineer spanish speaking",
+    "software engineer portuguese speaker",
+    "software engineer portuguese speaking",
+    "angular developer spanish speaker",
+    "react developer spanish speaker",
+    "angular developer portuguese",
+    "react developer portuguese",
+    "remote frontend developer latam",
+    "remote frontend engineer latin america",
+    "remote full stack latam",
+    "remote software engineer latam",
+    "desarrollador frontend remoto",
+    "desarrollador full stack remoto",
+    "ingeniero de software remoto",
+    "desarrollador angular remoto",
+    "desarrollador react remoto",
+    # Termos de cargo puro
+    "frontend developer",
+    "frontend engineer",
+    "full stack developer",
+    "full stack engineer",
+    "software engineer",
+    "angular developer",
+    "react developer",
+    "typescript developer",
+    "node.js developer",
+    # Termos de idioma/mercado soltos
     "spanish speaker",
     "spanish speaking",
     "portuguese and spanish",

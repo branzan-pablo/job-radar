@@ -42,6 +42,8 @@ def _vaga(titulo, local, modalidade):
 # passar nao provava que a cidade era aceita, provava que a UF era
 # ignorada.
 CIDADES_ACEITAS = [
+    ("São José do Rio Preto", "SP"),
+    ("São Paulo", "SP"),
     ("Campina Grande", "PB"),
     ("João Pessoa", "PB"),
     ("Recife", "PE"),
@@ -56,47 +58,23 @@ CIDADES_ACEITAS = [
 # ---------------------------------------------------------------- BRASIL
 
 @pytest.mark.parametrize("modalidade", ["Híbrido", "Presencial"])
-@pytest.mark.parametrize("cidade, uf", CIDADES_ACEITAS)
-def test_br_hibrido_e_presencial_nas_cidades_aceitas(cidade, uf, modalidade):
-    local = f"{cidade} - {uf}"
-    assert _vaga("Analista de Dados", local, modalidade).combina_com(PERFIL_BR.regras)
-
-
-# Variacoes de escrita que as fontes realmente usam -- separador, acento e
-# caixa nao podem mudar o resultado.
 @pytest.mark.parametrize("local", [
-    "Campina Grande", "Campina Grande - PB", "Campina Grande, PB",
-    "Campina Grande/PB", "CAMPINA GRANDE - PB", "campina grande, pb",
-    "João Pessoa - PB", "Joao Pessoa - PB",
-    "Manaus - AM", "Manaus, AM", "Manaus/AM",
-    "Recife - PE", "Caruaru, PE", "Natal/RN",
+    "São Paulo - SP", "São José do Rio Preto - SP", "Recife - PE",
+    "Natal - RN", "Belo Horizonte, MG", "Rio de Janeiro, RJ", "Curitiba - PR",
 ])
-def test_br_variacoes_de_escrita_da_cidade(local):
-    assert _vaga("Analista de Dados", local, "Híbrido").combina_com(PERFIL_BR.regras)
-
-
-@pytest.mark.parametrize("modalidade", ["Híbrido", "Presencial"])
-@pytest.mark.parametrize("local", [
-    "São Paulo - SP", "Belo Horizonte, MG", "Salvador - BA",
-    "Rio de Janeiro, RJ", "Curitiba - PR", "Brasília, DF",
-    "Fortaleza - CE", "Porto Alegre - RS",
-    # Estavam em CIDADES por engano e aceitavam hibrida/presencial
-    # fora da regra -- ver MEDIDO em config.py.
-    "Jaboatão dos Guararapes - PE", "Teresina - PI",
-    "São Luís - MA", "Petrolina - PE",
-])
-def test_br_hibrido_e_presencial_fora_das_cidades_e_rejeitado(local, modalidade):
-    assert not _vaga("Analista de Dados", local, modalidade).combina_com(PERFIL_BR.regras)
+def test_br_hibrido_e_presencial_sempre_rejeitado(local, modalidade):
+    """Presencial e Híbrido foram removidos — apenas vagas Remotas são aceitas."""
+    assert not _vaga("Desenvolvedor Front-End", local, modalidade).combina_com(PERFIL_BR.regras)
 
 
 @pytest.mark.parametrize("local", [
     "Remoto", "Remoto (São Paulo, SP)", "Remoto (Manaus, AM)",
     "Remoto - Brasil", "Remote, Brazil", "Remoto (Belo Horizonte, MG)",
+    "Remoto (São José do Rio Preto, SP)",
 ])
-def test_br_remoto_no_brasil_e_aceito_de_qualquer_cidade(local):
-    """Remoto nao tem restricao de cidade -- a regra de CIDADES vale so
-    pra hibrido/presencial."""
-    assert _vaga("Analista de Dados", local, "Remoto").combina_com(PERFIL_BR.regras)
+def test_br_remoto_no_brasil_e_aceito(local):
+    """Vagas remotas no Brasil são aceitas."""
+    assert _vaga("Desenvolvedor Front-End", local, "Remoto").combina_com(PERFIL_BR.regras)
 
 
 @pytest.mark.parametrize("local", [
@@ -104,7 +82,7 @@ def test_br_remoto_no_brasil_e_aceito_de_qualquer_cidade(local):
     "Remote - India",
 ])
 def test_br_remoto_de_mercado_nao_aceito_e_rejeitado(local):
-    assert not _vaga("Analista de Dados", local, "Remoto").combina_com(PERFIL_BR.regras)
+    assert not _vaga("Desenvolvedor Front-End", local, "Remoto").combina_com(PERFIL_BR.regras)
 
 
 # --------------------------------------------------------- INTERNACIONAL
@@ -115,7 +93,7 @@ def test_br_remoto_de_mercado_nao_aceito_e_rejeitado(local):
     "Remote - Latin America", "Remote - Colombia", "Buenos Aires, Argentina",
 ])
 def test_intl_remoto_em_mercado_aceito_e_aceito(local):
-    assert _vaga("Data Analyst", local, "Remoto").combina_com(PERFIL_INTL.regras)
+    assert _vaga("Frontend Developer", local, "Remoto").combina_com(PERFIL_INTL.regras)
 
 
 @pytest.mark.parametrize("modalidade", ["Híbrido", "Presencial"])
@@ -124,9 +102,9 @@ def test_intl_remoto_em_mercado_aceito_e_aceito(local):
     "Ciudad de México, México", "Buenos Aires, Argentina",
 ])
 def test_intl_hibrido_e_presencial_sempre_rejeitado(local, modalidade):
-    """Do exterior so interessa vaga remota -- nem mesmo em Portugal ou
-    Espanha vale presencial/hibrida."""
-    assert not _vaga("Data Analyst", local, modalidade).combina_com(PERFIL_INTL.regras)
+    """Do exterior só interessa vaga remota — nem mesmo em Portugal ou
+    Espanha vale presencial/híbrida."""
+    assert not _vaga("Frontend Developer", local, modalidade).combina_com(PERFIL_INTL.regras)
 
 
 @pytest.mark.parametrize("local", [
@@ -135,76 +113,80 @@ def test_intl_hibrido_e_presencial_sempre_rejeitado(local, modalidade):
     "Remote - India", "Remote - United Kingdom",
 ])
 def test_intl_remoto_de_mercado_de_lingua_inglesa_e_rejeitado(local):
-    assert not _vaga("Data Analyst", local, "Remoto").combina_com(PERFIL_INTL.regras)
+    assert not _vaga("Frontend Developer", local, "Remoto").combina_com(PERFIL_INTL.regras)
 
 
 def test_intl_titulo_hibrido_vence_a_classificacao_da_fonte():
-    """O filtro nativo do LinkedIn as vezes marca como remota uma vaga que
-    o proprio anuncio chama de hibrida -- o titulo vence."""
-    vaga = _vaga("Data Analyst (Analista de Datos) - Hybrid", "Madrid, Spain", "Remoto")
+    """O filtro nativo do LinkedIn às vezes marca como remota uma vaga que
+    o próprio anúncio chama de híbrida — o título vence."""
+    vaga = _vaga("Frontend Developer (Desarrollador Frontend) - Hybrid", "Madrid, Spain", "Remoto")
     assert vaga.modalidade == "Híbrido"
     assert not vaga.combina_com(PERFIL_INTL.regras)
 
 
 def test_intl_remoto_sem_mercado_declarado_exige_idioma_no_titulo():
-    """Sem pais declarado nao da pra saber o mercado -- ai o titulo precisa
-    dizer o idioma. Sem nenhum dos dois sinais, a vaga nao entra."""
-    assert _vaga("Data Analyst (Spanish speaker)", "Remote - Worldwide", "Remoto").combina_com(PERFIL_INTL.regras)
-    assert not _vaga("Data Analyst", "Remote - Worldwide", "Remoto").combina_com(PERFIL_INTL.regras)
+    """Sem país declarado não dá pra saber o mercado — aí o título precisa
+    dizer o idioma. Sem nenhum dos dois sinais, a vaga não entra."""
+    assert _vaga("Frontend Developer (Spanish speaker)", "Remote - Worldwide", "Remoto").combina_com(PERFIL_INTL.regras)
+    assert not _vaga("Frontend Developer", "Remote - Worldwide", "Remoto").combina_com(PERFIL_INTL.regras)
 
 
 # ------------------------------------------------------------------ CARGO
 
 @pytest.mark.parametrize("titulo, esperado", [
-    ("Analista de Dados Pleno", True),
-    ("Analista de BI", True),
-    ("Business Intelligence Analyst", True),
-    ("Business Analyst", False),               # ambiguo, sem qualificador
-    ("Business Analyst com SQL", True),        # ambiguo + qualificador
-    ("Analista de Power BI", True),            # ferramenta + cargo
-    ("Desenvolvedor Power BI", False),         # ferramenta sem cargo de analise
+    ("Desenvolvedor Front-End Pleno", True),
+    ("Desenvolvedor Frontend Sênior", True),
+    ("Frontend Engineer", True),
+    ("Desenvolvedor Full Stack", True),
+    ("Engenheiro de Software", True),
+    ("Desenvolvedor Angular", True),
+    ("Desenvolvedor React", True),
+    ("Angular Developer", True),
+    ("Tech Lead Frontend", True),
+    ("Desenvolvedor", False),               # ambíguo, sem qualificador
+    ("Desenvolvedor com Angular", True),    # ambíguo + qualificador
+    ("Desenvolvedor com React", True),      # ambíguo + qualificador
+    ("Angular Sênior", True),               # ferramenta + cargo
     ("Vendedor Externo", False),
-    ("Engenheiro de Dados", False),
+    ("Analista Fiscal", False),
 ])
 def test_cargo_no_titulo(titulo, esperado):
-    assert _vaga(titulo, "Recife - PE", "Presencial").combina_com(PERFIL_BR.regras) is esperado
+    assert _vaga(titulo, "Remoto", "Remoto").combina_com(PERFIL_BR.regras) is esperado
 
 
-# ------------------------- CIDADE DE NOME PARECIDO, ESTADO DIFERENTE
+# ------------------------------------------------------- INGLÊS OBRIGATÓRIO
 
-@pytest.mark.parametrize("local", [
-    # MEDIDO numa fonte real: "CAMPINA GRANDE DO SUL - PR" era aceita como
-    # se fosse Campina Grande/PB. Sao cidades diferentes, a 2.500 km.
-    "Campina Grande do Sul - PR",
-    "CAMPINA GRANDE DO SUL - PR",
-    "Campina Grande do Sul, PR",
-    "Campina Grande do Sul/PR",
-    # Mesmo caso, outra cidade da lista.
-    "Natal da Serra - MG",
-    # E o inverso: cidade certa, UF errada, ainda e outro lugar.
-    "Recife - SP",
-    "Manaus - PR",
+@pytest.mark.parametrize("titulo", [
+    "Desenvolvedor Front-End (Inglês Fluente)",
+    "Senior Frontend Developer - Fluent English",
+    "Desenvolvedor Full Stack - Inglês Avançado",
+    "Frontend Engineer - Advanced English",
+    "Engenheiro de Software (Inglês Obrigatório)",
+    "Desenvolvedor React - Mandatory English",
+    "Tech Lead Frontend - Fluent in English",
+    "Desarrollador Frontend - Inglés Avanzado",
+    "Frontend Developer (English Speaker)",
+    "Desenvolvedor Fullstack (Inglês: Fluente)",
+    "Senior Software Engineer (English: Fluent)",
 ])
-def test_cidade_de_nome_parecido_em_outro_estado_e_rejeitada(local):
-    assert not _vaga("Analista de Dados", local, "Presencial").combina_com(PERFIL_BR.regras)
+def test_vagas_com_ingles_obrigatorio_sao_rejeitadas(titulo):
+    """Vagas que exigem inglês obrigatório (fluente/avançado) são descartadas."""
+    vaga_br = _vaga(titulo, "Remoto", "Remoto")
+    assert not vaga_br.combina_com(PERFIL_BR.regras)
+
+    vaga_intl = _vaga(titulo, "Remote - Spain", "Remoto")
+    assert not vaga_intl.combina_com(PERFIL_INTL.regras)
 
 
-@pytest.mark.parametrize("local", [
-    "Campina Grande - PB", "CAMPINA GRANDE - PB", "Campina Grande, PB",
-    "Campina Grande/PB", "Natal - RN", "Recife - PE", "Recife, PE",
-    "Manaus - AM", "Caruaru - PE", "Joao Pessoa - PB", "Maceio - AL",
-    "Aracaju - SE",
+@pytest.mark.parametrize("titulo", [
+    "Desenvolvedor Front-End Sênior",
+    "Desenvolvedor Full Stack Pleno",
+    "Frontend Engineer",
+    "Desenvolvedor Angular (Inglês Desejável)",
+    "Desenvolvedor React - Diferencial Inglês",
+    "Desenvolvedor Node (Inglês Intermediário)",
 ])
-def test_cidade_certa_com_a_uf_certa_continua_passando(local):
-    assert _vaga("Analista de Dados", local, "Presencial").combina_com(PERFIL_BR.regras)
-
-
-@pytest.mark.parametrize("local", [
-    # Sem UF nenhuma nao ha o que comparar: continua passando, de proposito.
-    # Barrar aqui exigiria adivinhar por contagem de palavras, e isso
-    # derrubaria "vaga em Recife" e "Natal" sozinhos, que sao validos.
-    "Recife", "Natal", "Manaus", "Campina Grande",
-    "Vaga em Recife", "Recife, Pernambuco, Brasil",
-])
-def test_sem_uf_declarada_a_cidade_continua_valendo(local):
-    assert _vaga("Analista de Dados", local, "Presencial").combina_com(PERFIL_BR.regras)
+def test_vagas_sem_ingles_obrigatorio_passam(titulo):
+    """Vagas sem inglês obrigatório ou com inglês desejável continuam passando."""
+    vaga = _vaga(titulo, "Remoto", "Remoto")
+    assert vaga.combina_com(PERFIL_BR.regras)

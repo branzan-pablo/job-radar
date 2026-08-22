@@ -48,7 +48,6 @@ class LinkedInIntlScraper(BaseScraper):
         vagas: list[Job] = []
         for termo in self.termos_busca:
             for location in self.locations:
-                vagas.extend(self._buscar_termo(termo, location, remoto=False))
                 vagas.extend(self._buscar_termo(termo, location, remoto=True))
 
         logger.info(f"[LinkedIn Intl] {len(vagas)} vaga(s) encontrada(s) no total")

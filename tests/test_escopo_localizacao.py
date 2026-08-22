@@ -114,7 +114,7 @@ from core.job import Job                     # noqa: E402
 from core.perfis import PERFIL_BR, PERFIL_INTL  # noqa: E402
 
 
-def _vaga(local, modalidade, titulo="Analista de Dados"):
+def _vaga(local, modalidade, titulo="Desenvolvedor Front-End"):
     return Job(
         titulo=titulo, empresa="Empresa Teste", local=local,
         link=f"https://exemplo.com/{abs(hash((local, modalidade, titulo)))}",
@@ -135,15 +135,15 @@ def test_remoto_reconhecido_quando_a_fonte_nao_preenche_modalidade(local):
 
 @pytest.mark.parametrize("local, modalidade", [
     # A fonte declarou a modalidade: texto solto no local NAO sobrepoe.
-    ("Home Office - São Paulo, SP", "Presencial"),
-    ("Remoto (São Paulo, SP)", "Híbrido"),
+    ("Home Office - Belo Horizonte, MG", "Presencial"),
+    ("Remoto (Belo Horizonte, MG)", "Híbrido"),
     ("100% Remoto - Curitiba, PR", "Presencial"),
 ])
 def test_texto_do_local_nao_sobrepoe_modalidade_declarada(local, modalidade):
     assert not _vaga(local, modalidade).combina_com(PERFIL_BR.regras)
 
 
-@pytest.mark.parametrize("local", ["São Paulo - SP", "Bloomington, IN", "Remote - US only"])
+@pytest.mark.parametrize("local", ["Belo Horizonte - MG", "Bloomington, IN", "Remote - US only"])
 def test_fallback_de_modalidade_nao_abre_vaga_fora_da_regra(local):
     assert not _vaga(local, "").combina_com(PERFIL_BR.regras)
 
@@ -152,5 +152,5 @@ def test_titulo_nunca_serve_de_sinal_de_local():
     """Bug original desta base: titulo e local eram concatenados, entao
     vaga americana com "Hybrid Remote" no TITULO batia "remot" e passava
     como remota. O fallback le SO o campo local."""
-    vaga = _vaga("Bloomington, IN", "", titulo="Data Analyst (Hybrid Remote)")
+    vaga = _vaga("Bloomington, IN", "", titulo="Frontend Developer (Hybrid Remote)")
     assert not vaga.combina_com(PERFIL_BR.regras)

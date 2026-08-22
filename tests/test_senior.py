@@ -111,9 +111,9 @@ def test_local_sai_no_formato_que_o_filtro_de_cidade_entende():
     from core.perfis import PERFIL_BR
     from core.job import Job
 
-    job = Job(titulo="Analista de Dados", empresa="X",
+    job = Job(titulo="Desenvolvedor Front-End", empresa="X",
               local=_local({"city": "Natal", "province": "RN", "country": "Brasil"}),
-              link="https://x/1", site="Senior", modalidade="Presencial")
+              link="https://x/1", site="Senior", modalidade="Remoto")
     assert job.combina_com(PERFIL_BR.regras)
     assert extrair_escopo_remoto("Natal - RN", "Remoto") == {"Brasil"}
 

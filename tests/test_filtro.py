@@ -148,29 +148,27 @@ CASOS_COMBINA_COM = [
     # Anti-regressão crítica (mesmo caso do teste de escopo, agora
     # end-to-end): vaga americana sem sigla de estado tem que ser barrada
     # no perfil internacional (que só aceita LATAM/Ibéria).
-    ("seattle-barrada-perfil-intl", "Senior Data Analyst", "Greater Seattle Area", "Remoto", PERFIL_INTL, False),
+    ("seattle-barrada-perfil-intl", "Senior Frontend Developer", "Greater Seattle Area", "Remoto", PERFIL_INTL, False),
     # Remota sem mercado declarado: só passa se o TÍTULO afirmar idioma/
-    # região (spanish/portuguese/latam/...) — regra adicionada depois que
-    # "Senior Data Analyst" remoto sem relação nenhuma com o mercado
-    # passava só por não ter nada que a rejeitasse.
-    ("spanish-speaking-sem-mercado-passa", "Spanish Speaking Data Analyst", "Remote", "Remoto", PERFIL_INTL, True),
-    ("data-analyst-latam-passa", "Data Analyst LATAM", "Remote", "Remoto", PERFIL_INTL, True),
-    ("sem-idioma-sem-mercado-barrada", "Senior Data Analyst", "Remote", "Remoto", PERFIL_INTL, False),
+    # região (spanish/portuguese/latam/...)
+    ("spanish-speaking-sem-mercado-passa", "Spanish Speaking Frontend Developer", "Remote", "Remoto", PERFIL_INTL, True),
+    ("data-analyst-latam-passa", "Frontend Developer LATAM", "Remote", "Remoto", PERFIL_INTL, True),
+    ("sem-idioma-sem-mercado-barrada", "Senior Frontend Developer", "Remote", "Remoto", PERFIL_INTL, False),
     # Mercado CONFIRMADO no texto dispensa o sinal de idioma no título — o
     # país hispanofalante já é o próprio sinal.
-    ("mercado-confirmado-dispensa-idioma-no-titulo", "Senior Data Analyst", "Remote - Espanha", "Remoto", PERFIL_INTL, True),
+    ("mercado-confirmado-dispensa-idioma-no-titulo", "Senior Frontend Developer", "Remote - Espanha", "Remoto", PERFIL_INTL, True),
 
-    # Perfil Brasil: cargo e cidade são checados em campos separados
-    # (título vs. local) — cidade fora da lista aceita barra mesmo com
-    # cargo batendo.
-    ("cidade-fora-da-lista-barrada", "Analista de Dados", "Nova York", "Presencial", PERFIL_BR, False),
-    ("cargo-fora-do-escopo-barrado", "Vendedor Externo", "Recife, PE", "Presencial", PERFIL_BR, False),
-    ("cargo-forte-cidade-aceita-passa", "Analista de Dados Pleno", "Recife, PE", "Presencial", PERFIL_BR, True),
-    # keywords_ambiguo (ex: "Business Analyst") só conta com qualificador
-    # de dados junto no título — sozinho é ruído de outra área (RH,
-    # finanças).
-    ("cargo-ambiguo-sem-qualificador-barrado", "Business Analyst", "Recife, PE", "Presencial", PERFIL_BR, False),
-    ("cargo-ambiguo-com-qualificador-passa", "Business Analyst com SQL", "Recife, PE", "Presencial", PERFIL_BR, True),
+    # Perfil Brasil: apenas vagas REMOTAS são aceitas
+    ("presencial-sempre-barrado", "Desenvolvedor Front-End", "São Paulo, SP", "Presencial", PERFIL_BR, False),
+    ("hibrido-sempre-barrado", "Desenvolvedor Front-End", "São Paulo, SP", "Híbrido", PERFIL_BR, False),
+    ("cargo-fora-do-escopo-barrado", "Vendedor Externo", "Remoto", "Remoto", PERFIL_BR, False),
+    ("cargo-forte-remoto-passa", "Desenvolvedor Front-End Pleno", "Remoto", "Remoto", PERFIL_BR, True),
+    # keywords_ambiguo (ex: "Desenvolvedor") só conta com qualificador técnico junto no título.
+    ("cargo-ambiguo-sem-qualificador-barrado", "Desenvolvedor", "Remoto", "Remoto", PERFIL_BR, False),
+    ("cargo-ambiguo-com-qualificador-passa", "Desenvolvedor com Angular", "Remoto", "Remoto", PERFIL_BR, True),
+    # Rejeição de vagas que exigem inglês obrigatório
+    ("ingles-fluente-barrado-br", "Desenvolvedor Front-End (Inglês Fluente)", "Remoto", "Remoto", PERFIL_BR, False),
+    ("ingles-avancado-barrado-intl", "Senior Frontend Developer - Advanced English", "Remote - Espanha", "Remoto", PERFIL_INTL, False),
 ]
 
 
@@ -221,8 +219,49 @@ CASOS_PUBLICACAO_ANTIGA = [
 )
 def test_publicacao_antiga(nome, publicado_em, esperado):
     job = Job(
-        titulo="Analista de Dados", empresa="Teste", local="Recife, PE",
+        titulo="Desenvolvedor Front-End", empresa="Teste", local="Recife, PE",
         link=f"https://teste.invalido/{nome}", site="Teste", modalidade="Presencial",
         publicado_em=publicado_em,
     )
     assert job.publicacao_antiga == esperado
+
+
+# ---------------------------------------------------------------------------
+# Detecção de Senioridade e Pontuação de Relevância
+# ---------------------------------------------------------------------------
+
+@pytest.mark.parametrize("titulo, senioridade_esperada", [
+    ("Desenvolvedor Front-End Sênior", "Sênior"),
+    ("Senior Software Engineer", "Sênior"),
+    ("Sr. Frontend Developer", "Sênior"),
+    ("Tech Lead Frontend", "Liderança"),
+    ("Staff Frontend Engineer", "Especialista"),
+    ("Especialista Front-End", "Especialista"),
+    ("Desenvolvedor Full Stack Pleno", "Pleno"),
+    ("Desenvolvedor Frontend Júnior", "Júnior"),
+    ("Estagiário de Desenvolvimento", "Estágio/Trainee"),
+    ("Desenvolvedor Front-End", "Não especificado"),
+])
+def test_senioridade_detectada(titulo, senioridade_esperada):
+    job = Job(titulo=titulo, empresa="Teste", local="Remoto", link="https://x/1", site="Teste", modalidade="Remoto")
+    assert job.senioridade == senioridade_esperada
+
+
+def test_pontuar_relevancia_prioriza_senior_e_especialista():
+    # Vaga Sênior / Cargo forte / Remota confirmada -> Cargo (3) + Senioridade Alvo (2) + Mercado (2) = 7
+    job_senior = Job(
+        titulo="Desenvolvedor Front-End Sênior", empresa="Teste", local="Remoto (São Paulo, SP)",
+        link="https://x/senior", site="LinkedIn", modalidade="Remoto",
+    )
+    score_senior = job_senior.pontuar_relevancia(PERFIL_BR.regras)
+
+    # Vaga Júnior / Cargo forte / Remota confirmada -> Cargo (3) + Senioridade Abaixo (-2) + Mercado (2) = 3
+    job_junior = Job(
+        titulo="Desenvolvedor Front-End Júnior", empresa="Teste", local="Remoto (São Paulo, SP)",
+        link="https://x/junior", site="LinkedIn", modalidade="Remoto",
+    )
+    score_junior = job_junior.pontuar_relevancia(PERFIL_BR.regras)
+
+    assert score_senior > score_junior
+    assert score_senior >= 7
+

@@ -4,205 +4,229 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# Cargo forte: título que só existe mesmo em vaga de dados/BI, sem
-# possibilidade real de ser outra área.
+# Cargo forte: título que representa claramente vaga de Front-End, Full Stack
+# ou Engenharia de Software, sem necessidade de qualificador extra no título.
 KEYWORDS_CARGO_FORTE = [
-    "Analista de Dados",
-    "Analista BI",
-    "Analista de BI",
-    "Business Intelligence",
-    "Data Analytics",
-    "Analista de Analytics",
-    "Data Analyst",
-    "Desenvolvedor BI",
-    "Consultor BI",
-    "Analista de Inteligência de Negócios",
-    "BI Developer",
-    "BI Analyst",
-    "Analista de Reporting",
-    "Analista de Inteligência de Mercado",
-    "Analista de Indicadores",
-    "Reporting Analyst",
-    "Insights Analyst",
-    "Data Insights Analyst",
-    "MIS Analyst",
-    "Analista de MIS",
-    "Assistente de BI",
-    "Auxiliar de BI",
-    "Analista de Inteligência Comercial",
-    "Data Specialist",
-    "Data Quality Analyst",
-    "Data Intelligence Analyst",
-    "BI & Analytics Analyst",
-    "Analytics Specialist",
-    "Especialista em Dados",
-    "Analista de Planejamento e Dados",
-    # "Datos" (espanhol) não é "Dados" (português) — nenhuma keyword em
-    # português cobre título em espanhol, mesmo sendo a mesma vaga. Faz
-    # sentido aqui no pipeline BR (não só em config_intl.py) porque
-    # LinkedInScraper já busca em Argentina/Chile (ver LOCATIONS_LINKEDIN).
-    "Analista de Datos",
-    "Analítica de Datos",
+    # Front-End
+    "Desenvolvedor Front-End",
+    "Desenvolvedora Front-End",
+    "Desenvolvedor Frontend",
+    "Desenvolvedora Frontend",
+    "Front-End Developer",
+    "Frontend Developer",
+    "Frontend Engineer",
+    "Front-End Engineer",
+    "Engenheiro Front-End",
+    "Engenheira Front-End",
+    "Engenheiro Frontend",
+    "Engenheira Frontend",
+    "Especialista Front-End",
+    "Especialista Frontend",
+    "Frontend Specialist",
+    "Tech Lead Frontend",
+    "Frontend Tech Lead",
+    "Frontend Lead",
+    "Líder Técnico Frontend",
+    # Full Stack
+    "Desenvolvedor Full Stack",
+    "Desenvolvedora Full Stack",
+    "Desenvolvedor Fullstack",
+    "Desenvolvedora Fullstack",
+    "Full Stack Developer",
+    "Fullstack Developer",
+    "Full Stack Engineer",
+    "Fullstack Engineer",
+    "Engenheiro Full Stack",
+    "Engenheira Full Stack",
+    "Engenheiro Fullstack",
+    "Engenheira Fullstack",
+    "Tech Lead Full Stack",
+    "Tech Lead Fullstack",
+    "Full Stack Specialist",
+    "Especialista Full Stack",
+    # Engenharia de Software & Web
+    "Engenheiro de Software",
+    "Engenheira de Software",
+    "Software Engineer",
+    "Desenvolvedor de Software",
+    "Desenvolvedora de Software",
+    "Software Developer",
+    "Desenvolvedor Web",
+    "Web Developer",
+    # Stack Específica
+    "Desenvolvedor Angular",
+    "Angular Developer",
+    "Desenvolvedor React",
+    "React Developer",
+    "Desenvolvedor Vue",
+    "Vue Developer",
+    "Desenvolvedor Next",
+    "Next.js Developer",
+    "Desenvolvedor Node",
+    "Node.js Developer",
+    "Desenvolvedor .NET",
+    ".NET Developer",
+    "Desenvolvedor C#",
+    "C# Developer",
+    "Desenvolvedor TypeScript",
+    "TypeScript Developer",
+    # Nomenclatura em espanhol (usada em buscas latam/ibéricas)
+    "Desarrollador Frontend",
+    "Desarrolladora Frontend",
+    "Desarrollador Front-End",
+    "Ingeniero Frontend",
+    "Ingeniero Front-End",
+    "Desarrollador Full Stack",
+    "Desarrollador Fullstack",
+    "Ingeniero Full Stack",
+    "Ingeniero Fullstack",
+    "Ingeniero de Software",
+    "Desarrollador de Software",
+    "Desarrollador Angular",
+    "Desarrollador React",
+    "Desarrollador .NET",
+    "Desarrollador Node",
 ]
 
-# Cargo ambíguo: título que também é usado em vaga sem nada a ver com
-# dados/BI (ex: "Business Analyst" e "Analista de Negócios" existem em
-# TI, finanças, RH, operações... qualquer área). Só conta como match se o
-# título TAMBÉM tiver um QUALIFICADORES_DADOS junto — é o que permite ir
-# adicionando cargo adjacente (Product Analyst, CRM Analyst, Marketing
-# Analyst etc.) sem cada um virar fonte de ruído sozinho.
+# Cargo ambíguo: títulos genéricos que também são usados em outras áreas
+# ou stacks não relacionadas. Só conta como match se o título TAMBÉM tiver
+# um dos QUALIFICADORES_DADOS (stack técnica) junto.
 KEYWORDS_CARGO_AMBIGUO = [
-    "Business Analyst",
-    "Analista de Negócios",
-    "Business Analytics",
-    "Analista de Performance",
+    "Desenvolvedor",
+    "Desenvolvedora",
+    "Developer",
+    "Programador",
+    "Programadora",
+    "Programmer",
+    "Engenheiro",
+    "Engenheira",
+    "Engineer",
+    "Tech Lead",
+    "Líder Técnico",
+    "Lider Tecnico",
+    "Arquiteto de Software",
+    "Software Architect",
+    "Especialista",
 ]
 
-# Termo que precisa aparecer junto no título quando o cargo é ambíguo, pra
-# confirmar que é vaga de dados/BI e não de outra área qualquer.
+# Termo técnico que precisa aparecer junto no título quando o cargo é ambíguo,
+# confirmando que é vaga de Front-End, Full Stack ou da stack alvo.
 QUALIFICADORES_DADOS = [
-    "dados",
-    "data",
-    "bi",
-    "sql",
-    "power bi",
-    "analytics",
-    "kpi",
-    "dashboard",
-    "métricas",
-    "reporting",
-    "insights",
+    "frontend",
+    "front-end",
+    "front end",
+    "fullstack",
+    "full stack",
+    "full-stack",
+    "angular",
+    "react",
+    "next.js",
+    "nextjs",
+    "vue",
+    "vue.js",
+    "vuejs",
+    "nuxt",
+    "nuxtjs",
+    "typescript",
+    "javascript",
+    "node",
+    "nodejs",
+    "node.js",
+    "nestjs",
+    "c#",
+    ".net",
+    "dotnet",
+    "web",
+    "software",
+    "micro frontend",
+    "microfrontend",
+    "microfrontends",
+    "micro-frontend",
+    "micro-frontends",
 ]
 
-# Ferramenta que aparece como núcleo do título ("Analista de Power BI").
-# Só conta como match se o título TAMBÉM tiver uma palavra de cargo — é o
-# espelho da regra de KEYWORDS_CARGO_AMBIGUO: lá o cargo é ambíguo e pede
-# domínio, aqui a ferramenta é ambígua e pede cargo. Sem isso, "Power BI"
-# sozinho aprovaria "Power BI Senior" e "Desenvolvedor (Power BI + Python)",
-# que são vaga de desenvolvimento, não de análise.
+# Ferramenta/framework que aparece como núcleo do título (ex: "Angular Sênior").
+# Só conta como match se o título TAMBÉM tiver uma palavra de cargo
+# (ver QUALIFICADORES_CARGO).
 FERRAMENTAS_TITULO = [
-    "Power BI",
+    "Angular",
+    "React",
+    "Next.js",
+    "Vue",
+    "Vue.js",
+    "Nuxt",
+    "Nuxt.js",
+    "TypeScript",
+    "Node.js",
+    "NestJS",
+    ".NET",
+    "C#",
+    "Micro Frontend",
 ]
 
-# Palavra de cargo que confirma que a vaga de ferramenta é de análise.
-# "desenvolvedor"/"developer"/"engenheiro" ficam FORA de propósito: é o que
-# mantém vaga de dev fora do radar.
+# Palavra de cargo que confirma que a vaga de ferramenta é de desenvolvimento/engenharia.
 QUALIFICADORES_CARGO = [
+    "desenvolvedor",
+    "desenvolvedora",
+    "developer",
+    "engenheiro",
+    "engenheira",
+    "engineer",
+    "programador",
+    "programadora",
+    "programmer",
     "analista",
-    "analyst",
     "especialista",
     "specialist",
-    "consultor",
-    "consultant",
+    "lead",
+    "lider",
+    "líder",
+    "arquiteto",
+    "architect",
+    "senior",
+    "sênior",
+    "pleno",
+    "tech lead",
 ]
 
 KEYWORDS = KEYWORDS_CARGO_FORTE + KEYWORDS_CARGO_AMBIGUO
 
-# Termos de busca enviados a cada site. Ficam separados das KEYWORDS de
-# propósito: TERMOS_BUSCA é a rede ampla (o que é pesquisado em cada site,
-# incluindo termos de ferramenta/stack pra achar vaga com título atípico),
-# enquanto KEYWORDS é o filtro final e só olha o título da vaga já
-# encontrada. Um termo de ferramenta (ex: "dax") só resulta em notificação
-# se o TÍTULO da vaga também bater com uma keyword de cargo — isso evita
-# falso positivo de vaga que só cita a ferramenta como diferencial.
-#
-# TERMOS_CARGO é derivado direto de KEYWORDS (em vez de mantido à mão em
-# lista separada) — antes as duas listas divergiam: metade das KEYWORDS
-# (ex: "Desenvolvedor BI", "BI Analyst", "Analista de Negócios") nunca era
-# buscada de verdade, só existia como filtro, então só pegava essas vagas
-# por sorte via outro termo. Com a derivação automática isso não pode mais
-# acontecer — toda keyword nova em KEYWORDS já vira busca também.
+# Termos de busca enviados a cada site.
 TERMOS_CARGO_EXTRA = [
-    # termos mais amplos que a keyword exata, mantidos por dar rede mais
-    # larga na busca (a keyword em si é mais restrita, de propósito, pra
-    # não gerar falso positivo no filtro de título).
-    "power bi",
-    "inteligência de mercado",
+    "frontend",
+    "front-end",
+    "full stack",
+    "fullstack",
+    "software engineer",
 ]
 
 TERMOS_CARGO = sorted(set(k.lower() for k in KEYWORDS) | set(TERMOS_CARGO_EXTRA))
 
-# MEDIDO em jobradar.log (12 rodízios completos, Gupy+99Jobs+GeekHunter+
-# Solides): "dax" e "power query" nunca resultaram em nenhuma vaga nova
-# notificada nessas 4 fontes — 0 em 48 buscas cada, a maioria vazia
-# ("0 resultados reais") e o resto timeout. "microsoft fabric" teve 1 vaga
-# no log inteiro (363 notificações) com o termo no título, e essa vaga
-# também tinha "Power BI"/"Analista de BI" no título — já seria achada por
-# termo que continua na lista. Timeout: os 3 termos concentraram metade
-# (13 de 26) dos timeouts dessas 4 fontes sendo só 3 dos 42 termos (7%) —
-# confirma o padrão relatado. Removidos por render zero e custarem sessão
-# igual a um termo de cargo.
 TERMOS_FERRAMENTA = [
-    "sql",
-    "python",
-    "tableau",
-    "qlik",
-    "looker",
-    "bigquery",
+    "angular",
+    "react",
+    "next.js",
+    "vue.js",
+    "nuxt.js",
+    "typescript",
+    "node.js",
+    "nestjs",
+    ".net",
+    "c#",
+    "micro frontends",
 ]
 
 TERMOS_BUSCA = TERMOS_CARGO + TERMOS_FERRAMENTA
 
-# Medido: os TERMOS_BUSCA inteiros (hoje 42) rodando em TODO ciclo é o que
-# gera as centenas de sessões de navegador por execução — o custo cresce
-# linear com o tamanho da lista, e a lista só cresce (mais ainda com a
-# expansão internacional puxando mais termos no radar). TERMOS_POR_CICLO é
-# o tamanho do BLOCO usado por ciclo, não o total de termos — main.py roda
-# um bloco por vez em rodízio (ver _proximo_bloco_termos) e avança pro
-# próximo bloco no ciclo seguinte, salvando a posição no jobs.db. Isso
-# desacopla custo por ciclo de tamanho da lista: dobrar TERMOS_BUSCA dobra
-# quantos ciclos até cobrir tudo de novo, não o custo de cada ciclo.
 TERMOS_POR_CICLO = 10
 
-# Onde vaga HIBRIDA ou PRESENCIAL e aceita (mais "Remoto", que nao e
-# cidade e sim a porta de entrada da regra de modalidade remota — ver
-# _FLAGS_REMOTO em job.py). Vaga hibrida/presencial fora desta lista e
-# rejeitada; e uma whitelist, nao uma preferencia de ordenacao.
-#
-# Lista revisada contra o requisito escrito pela usuaria: as seis cidades
-# obrigatorias sao Campina Grande, Joao Pessoa, Recife, Natal, Caruaru e
-# Manaus. Maceio e Aracaju ficam por decisao explicita dela (interessam,
-# mesmo fora do requisito minimo).
-#
-# MEDIDO: a lista anterior era "Nordeste", nao "as cidades que interessam",
-# e divergia do requisito nos dois sentidos ao mesmo tempo:
-#   - FALTAVA Manaus. Confirmado em teste: "Manaus - AM" + Hibrido era
-#     REJEITADA. Nenhuma vaga presencial/hibrida de Manaus podia entrar,
-#     e a busca por cidade do LinkedIn (derivada desta lista) nunca
-#     procurou la.
-#   - SOBRAVAM Jaboatao, Teresina, Sao Luis e Petrolina, que aceitavam
-#     hibrida/presencial fora da regra. Confirmado em teste.
-# Nenhum dos 76 testes existentes cobria essas regras — por isso a
-# divergencia sobreviveu. Agora esta em tests/test_regras_de_negocio.py.
-#
-# Custo: LOCATIONS_LINKEDIN_CIDADES_PRESENCIAL e derivada daqui, entao
-# cada cidade e uma busca a mais por termo no LinkedIn. Sai de 11 cidades
-# para 8 — menos requisicao por ciclo E cobrindo Manaus, que faltava.
+# Onde vaga é aceita — apenas vagas REMOTAS (Presencial e Híbrido removidos).
 CIDADES = [
     "Remoto",
-    # As seis do requisito
-    "Campina Grande",
-    "João Pessoa",
-    "Recife",
-    "Natal",
-    "Caruaru",
-    "Manaus",
-    # Mantidas por decisao da usuaria, alem do requisito minimo
-    "Maceió",
-    "Aracaju",
 ]
 
-# MEDIDO: "Data Analyst @ Lisboa" e "Analista de Datos @ Madrid" reprovavam
-# na localização, não no cargo — CIDADES acima é whitelist só de cidade
-# brasileira, e a expansão de LOCATIONS_LINKEDIN pra Argentina/Chile (ver
-# abaixo) passou a trazer vaga presencial/híbrida em Portugal/Espanha de
-# vez em quando junto. Lista SEPARADA (não misturada em CIDADES, que
-# continua só-Brasil de propósito — ver decisão registrada na criação do
-# config_intl.py) com toggle próprio, pra dar pra ligar/desligar esse eixo
-# sem mexer no resto do filtro. Canônica aqui porque config_intl.py já
-# importa de config.py (não o contrário) — o pipeline internacional reusa
-# essa mesma lista em vez de manter uma cópia (risco de divergir, mesmo
-# motivo da unificação de _contem_termo/_tem_termo).
+# MEDIDO: CIDADES_EUROPA_IBERICA continua definida caso o usuário queira
+# religar o eixo presencial ibérico no futuro.
 CIDADES_EUROPA_IBERICA = [
     "Portugal",
     "Lisboa",
@@ -216,51 +240,18 @@ CIDADES_EUROPA_IBERICA = [
     "Valencia",
 ]
 
-# Toggle independente do ATIVAR_EIXO_IBERICO de config_intl.py — são dois
-# eixos diferentes (esse aqui é do pipeline BR/main.py, aquele é do
-# pipeline internacional/main_intl.py), cada um com seu próprio liga/
-# desliga, mesmo compartilhando a mesma lista de cidades acima.
-#
-# DESLIGADO: do mercado internacional, só interessa vaga remota — vaga
-# presencial/híbrida em Lisboa/Madrid (o que esse eixo notifica, marcada
-# "exploratória") não é o que o usuário quer. CIDADES_EUROPA_IBERICA
-# continua definida (não precisa apagar) pra caso o eixo volte a ser
-# ligado depois — só o toggle muda.
+# Toggle independente do ATIVAR_EIXO_IBERICO de config_intl.py.
+# DESLIGADO: usuário só busca vagas remotas.
 ATIVAR_EIXO_IBERICO_BR = False
 
-# LinkedInScraper é a única fonte do pipeline BR que também alcança vaga
-# fora do Brasil (as outras são portais brasileiros) — mas até aqui rodava
-# só com location=Brasil fixo no código (scrapers/linkedin.py:88), então
-# essa "porta pra fora" nunca era usada.
-#
-# Mercado "casa": busca modalidade completa (presencial/híbrida + remoto),
-# porque o usuário mora aqui e vaga local de verdade interessa.
+# Mercados pesquisados no LinkedIn
 LOCATIONS_LINKEDIN = ["Brasil"]
 
-# Mercados adicionais: só busca REMOTA (f_WT=2) — vaga presencial/híbrida
-# num país onde o usuário não mora não serve, então nem faz sentido gastar
-# a passada nacional ali (era puro desperdício: Argentina/Chile já rodavam
-# as duas passadas antes, mas a nacional nunca batia em CIDADES mesmo,
-# que é só cidade brasileira). Espanhol ou português — mesmo critério do
-# pipeline internacional. Lista reaproveita exatamente os países já usados
-# e testados ao vivo no endpoint do LinkedIn em config_intl.py
-# (LOCATIONS_INTL) — evita arriscar nome de país nunca testado (grafia
-# errada ou região que o LinkedIn não resolve como location de verdade,
-# como já visto com "LATAM"/"Latin America").
+# Mercados adicionais: só busca REMOTA (f_WT=2)
 LOCATIONS_LINKEDIN_REMOTO_APENAS = ["Argentina", "Chile", "México", "Colômbia", "Espanha", "Portugal"]
 
-# MEDIDO: a passada nacional acima (location="Brasil") varre o país inteiro
-# e só sobra o que bate em CIDADES depois do filtro — pra termo concorrido
-# em SP/RJ/MG (a maioria), as 3 páginas (30 resultados) nunca chegam numa
-# vaga de cidade menor do Nordeste, porque o volume dos polos maiores
-# ocupa tudo antes. Testado ao vivo: página 1 de "analista de dados" em
-# Brasil inteiro veio 100% São Paulo/Curitiba/Brasília, nenhuma do
-# Nordeste. Busca ESPECÍFICA por cidade não depende de volume nacional —
-# o próprio location= do LinkedIn já restringe o resultado à cidade, então
-# funciona mesmo quando SP/RJ dominam o termo. "Remoto" (item de CIDADES)
-# não é local de busca de verdade — sai da lista, já coberto pela passada
-# remoto=True de LOCATIONS_LINKEDIN acima.
-LOCATIONS_LINKEDIN_CIDADES_PRESENCIAL = [c for c in CIDADES if c != "Remoto"]
+# Vagas presenciais desativadas — lista vazia para não rodar buscas presenciais por cidade
+LOCATIONS_LINKEDIN_CIDADES_PRESENCIAL = []
 
 # Mercado que a vaga remota precisa aceitar pra contar, quando o texto de
 # local DECLARA um escopo geográfico ("Remote — US only", "Remote — India").
