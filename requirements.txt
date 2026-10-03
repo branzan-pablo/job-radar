@@ -1,7 +1,6 @@
-
 playwright==1.62.0
 requests==2.34.2
 python-dotenv==1.2.2
 pytest==9.1.1
 python-telegram-bot==21.11.1
-pywin32==312
+pywin32==312; sys_platform == "win32"
