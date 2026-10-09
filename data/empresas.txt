@@ -1,10 +1,6 @@
 # Lista de empresas para envio de currículo
 # Formato: NOME DA EMPRESA;email@empresa.com
 # Linhas que começam com # são ignoradas
-#
-# Exemplo:
-# Empresa Exemplo;rh@empresa-exemplo.com
-# Tech Solutions;contato@techsolutions.com.br
 
 # ============================================================
 # Adicione suas empresas abaixo:
@@ -12,4 +8,78 @@
 
 # Empresa Exemplo;rh@empresa.com
 
-Empresa Teste;pablo_ferreira14@hotmail.com
+Empresa TESTE;branzan.pablo@gmail.com
+
+Empresa Nexmuv Tecnologia;bruna.santos@nexmuv.com.br
+Empresa Sylision;giovani@sylision.com
+Empresa Antlia;rh@antlia.com.br
+Empresa Villadal;rh.vagas@villadal.com.br
+Empresa Capitani Group;rh@capitani.com.br
+Empresa Iventis Tecnologia;recrutamento@iventis.com.br
+Empresa K2 Partnering Solutions;fbenetti@k2partnering.com
+Empresa HUNTINGTI;contato@huntingti.com
+Empresa Advice Tech / Advice Compliance;rh@advicetech.com.br
+Empresa RHTI;comercial@rhti.com.br
+Empresa Decision Group;tais@decisiongroup.com.br
+Empresa Grupo Easy;gabriella.salamanca@grupoeasy.com.br
+Empresa Megawork;oportunidademegawork@megawork-gft.com.br
+Empresa 200DEV;marisa.cardilli@200dev.com
+Empresa 200DEV;rs@200dev.com
+Empresa TO Brasil;bianca.cunha@to-brasil.com
+Empresa InSTI;selecao@insti.com.br
+Empresa Tecmaster;daiane.soares@tecmaster.inf.br
+Empresa Tecmaster;gabriela.prado@tecmaster.inf.br
+Empresa GS2 Consulting;bancodetalentos@gs2.consulting
+Empresa Opikode;recursoshumanos@opikode.com
+Empresa 4Quality Tecnologia;vagasticurriculos@gmail.com
+Empresa Capta Tecnologia;rh@capta.com.br
+Empresa Athon Consulting;carreira@athonconsulting.com
+Empresa Tegra;mariana.baldini@tegra.com.br
+Empresa Tessa Talent;laisa.bertoni@tessatalent.com
+Empresa LANDtech;rh@landtech.com.br
+Empresa Genesys Tech;gabriella@genesysrh.com
+Empresa Logical Minds;vagas@logicalminds.com.br
+Empresa Mirante Tecnologia;curriculosrh@mirante.net.br
+Empresa HMB Tecnologia;rosilene.rezende@hmbtecnologia.com.br
+Empresa Alcateia Talentos Humanos;bruno@alcateiath.com.br
+Empresa Gestran;recrutamento@gestran.com.br
+Empresa API Helper Tech;recrutamento@apihelper.com.br
+Empresa Nova Software;trabalheconosco@softwaresnova.com.br
+Empresa Planne;jobs@planne.com.br
+Empresa Eficaz Consultoria;vagas@eficazconsultoria.net.br
+Empresa Review ALL;victor@reviewall.com.br
+Empresa Review ALL;contact@reviewall.company
+Empresa USYS;rh@usystech.com.br
+Empresa Epadoca;curriculo@epadoca.com
+Empresa Dione Solutions;career@dione.solutions
+Empresa Salsa Technology;contact@salsatechnology.com
+Empresa Instar Tecnologia;atendimento@instar.com.br
+Empresa Instar Tecnologia;lucas@instar.com.br
+Empresa Instar Tecnologia;rh@instar.com.br
+Empresa .add;comunicacao@somosadd.com.br
+Empresa EQPI Tech;comercial@eqpitech.com.br
+Empresa ClusterVet;privacidade@clustervet.com
+Empresa Tech For TI;mnascimento@techforti.com.br
+Empresa innolevels;vagas@innolevels.com.br
+Empresa IT2YOU;analigiagarcia@ittwoyou.com.br
+Empresa Code Group;jessica.chamelette@codegroup.com.br
+Empresa HRSoul;rferraz@hrsoul.com.br
+Empresa DOMVS iT;rhvagas@domvsit.com.br
+Empresa Mouts TI;recrutamento@mouts.info
+Empresa Mouts TI;rh@mouts.info
+Empresa Pasquali Solution;raquel.domingues@pasqualisolution.com.br
+Empresa CX Consulting;recrutamento@cxconsulting.com.br
+Empresa UltraCon Consultoria;falecom@ultracon.com.br
+Empresa AL Consultoria Tech;vaga-372044@vagas.abler.in
+Empresa VONBZ;selecao@vonbz.com
+Empresa Talent Academy;renata.betti@talentacademy.com.br
+Empresa NAVA;talentacquisition@nava.com.br
+Empresa NAVA;vemserincrivel@nava.com.br
+Empresa MJV Technology;rhsp@mjv.com.br
+Empresa MJV Technology;rhcuritiba@mjv.com.br
+Empresa Global TI;recrutamento@globalti.com.br
+Empresa CBYK;paloma.rodrigues@cbyk.com.br
+Empresa Foursys;recrutamento@foursys.com.br
+Empresa Qintess;recrutamentoeselecao@qintess.com
+Empresa IT Lean;curriculo@itlean.com.br
+Empresa 4Solution Group;andrea@4solutiongroup.com.br

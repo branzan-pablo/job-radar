@@ -4,8 +4,8 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# Cargo forte: título que representa claramente vaga de Front-End, Full Stack
-# ou Engenharia de Software, sem necessidade de qualificador extra no título.
+# Cargos usados para encontrar candidatas; Job._avaliar aplica depois um
+# gate estrito que só aprova Frontend/Front-End e funções de framework frontend.
 KEYWORDS_CARGO_FORTE = [
     # Front-End
     "Desenvolvedor Front-End",
@@ -311,6 +311,9 @@ LIMIAR_DIGEST_IMEDIATO = 7
 # seguinte do mesmo dia UTC serve de recuperação.
 DIGEST_HORA_UTC = 9
 
+TELEGRAM_HABILITADO = os.getenv("TELEGRAM_HABILITADO", "false").strip().lower() in {
+    "1", "true", "yes", "sim", "on"
+}
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "")
 TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", "")
 

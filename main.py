@@ -6,7 +6,12 @@ from collections import Counter
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import date, datetime, timezone
 
-from core.config import DIGEST_HORA_UTC, INTERVALO_MINUTOS, LIMIAR_DIGEST_IMEDIATO
+from core.config import (
+    DIGEST_HORA_UTC,
+    INTERVALO_MINUTOS,
+    LIMIAR_DIGEST_IMEDIATO,
+    TELEGRAM_HABILITADO,
+)
 from database.database import (
     BancoVazioSuspeito,
     definir_metadado,
@@ -26,9 +31,27 @@ from notifier.telegram import (
 )
 from core.perfis import FREQUENCIA_ALTA, PERFIS, Perfil
 from utils.filtro import filtrar_vagas
+from utils.contatos_vagas import gerar_indice_vagas_sem_email, registrar_vaga
 from core.logger import get_logger
 
 logger = get_logger()
+
+
+def _registrar_destino_local(vaga, perfil: Perfil):
+    try:
+        resultado = registrar_vaga(vaga)
+    except OSError as erro:
+        logger.warning(
+            f"[{perfil.nome}] Não foi possível registrar destino de candidatura "
+            f"({type(erro).__name__})."
+        )
+        return
+
+    if resultado.endswith("adicionado"):
+        logger.info(
+            f"[{perfil.nome}] Destino de candidatura registrado: "
+            f"{vaga.empresa} ({resultado})"
+        )
 
 
 def _fontes_baixa_frequencia_ja_rodaram_hoje(perfil: Perfil) -> bool:
@@ -313,6 +336,8 @@ def ciclo_de_busca(perfil: Perfil):
                 if ja_vista(vaga):
                     continue
 
+                _registrar_destino_local(vaga, perfil)
+
                 # Item 08: só notifica na hora quando a relevância passa do
                 # limiar (ver LIMIAR_DIGEST_IMEDIATO em config.py) — abaixo
                 # disso, vai pra fila do digest diário sem mensagem
@@ -331,7 +356,13 @@ def ciclo_de_busca(perfil: Perfil):
                 # sem volume novo suficiente a antiga não sai da 1ª página).
                 # Não é descartada (mesma vaga ainda pode estar aberta) — só
                 # sai do caminho "🚨 urgente" e vai pro digest em lote.
-                if vaga.relevancia >= LIMIAR_DIGEST_IMEDIATO and not vaga.publicacao_antiga:
+                if not TELEGRAM_HABILITADO:
+                    salvar_vaga(vaga, perfil_chave=perfil.chave)
+                    logger.info(
+                        f"[{perfil.nome}] Nova vaga salva localmente (Telegram desativado): "
+                        f"{vaga.titulo} - {vaga.empresa}"
+                    )
+                elif vaga.relevancia >= LIMIAR_DIGEST_IMEDIATO and not vaga.publicacao_antiga:
                     # Notifica ANTES de salvar. Se salvasse primeiro e o
                     # Telegram falhasse, a vaga ficava marcada como "vista"
                     # pra sempre — o próximo ciclo pulava ela em ja_vista()
@@ -360,8 +391,16 @@ def ciclo_de_busca(perfil: Perfil):
                 if ja_vista(vaga):
                     continue
 
+                _registrar_destino_local(vaga, perfil)
+
                 # Mesma regra de vaga antiga do loop acima.
-                if vaga.relevancia >= LIMIAR_DIGEST_IMEDIATO and not vaga.publicacao_antiga:
+                if not TELEGRAM_HABILITADO:
+                    salvar_vaga(vaga, perfil_chave=perfil.chave, exploratoria=True)
+                    logger.info(
+                        f"[{perfil.nome}] Nova vaga exploratória salva localmente "
+                        f"(Telegram desativado): {vaga.titulo} - {vaga.empresa}"
+                    )
+                elif vaga.relevancia >= LIMIAR_DIGEST_IMEDIATO and not vaga.publicacao_antiga:
                     if not notificar_vaga_exploratoria(vaga):
                         logger.warning(
                             f"[{perfil.nome}] Falha ao notificar '{vaga.titulo}' (exploratória) - "
@@ -397,6 +436,14 @@ def ciclo_de_busca(perfil: Perfil):
         f"{total_novas} nova(s)."
     )
 
+    try:
+        gerar_indice_vagas_sem_email()
+    except OSError as erro:
+        logger.warning(
+            f"[{perfil.nome}] Não foi possível atualizar o índice de vagas "
+            f"({type(erro).__name__})."
+        )
+
     # MEDIDO: descarte por escopo era invisível no log — o funil mostra
     # bruta → filtrada → nova, mas nunca QUAL escopo derrubou vaga nem
     # QUANTAS. Um escopo mal reconhecido (texto cru tipo "lagos nigeria",
@@ -415,7 +462,7 @@ def ciclo_de_busca(perfil: Perfil):
     # Telegram. Sem isso, um bloqueio geral ou mudança de layout passaria
     # despercebido — o workflow do GitHub Actions continuaria "verde" mesmo
     # com tudo quebrado.
-    if _deve_alertar_saude(len(scrapers_com_problema), len(scrapers)):
+    if TELEGRAM_HABILITADO and _deve_alertar_saude(len(scrapers_com_problema), len(scrapers)):
         enviar_mensagem(
             f"⚠️ <b>JobRadar {perfil.nome} com problema</b>\n\n"
             f"{len(scrapers_com_problema)}/{len(scrapers)} fontes falharam ou voltaram "
@@ -423,8 +470,9 @@ def ciclo_de_busca(perfil: Perfil):
             "Vale checar o log do GitHub Actions."
         )
 
-    _enviar_heartbeat_diario(perfil, total_novas, scrapers_com_problema, len(scrapers))
-    _enviar_digest_diario(perfil)
+    if TELEGRAM_HABILITADO:
+        _enviar_heartbeat_diario(perfil, total_novas, scrapers_com_problema, len(scrapers))
+        _enviar_digest_diario(perfil)
 
 
 def _rodar_um_ciclo_de_cada(perfis: list[Perfil]):
@@ -432,7 +480,8 @@ def _rodar_um_ciclo_de_cada(perfis: list[Perfil]):
     # processar_feedback_pendente) é global — feedback de vaga não tem
     # perfil, e rodar duas vezes na mesma execução só gastaria uma chamada
     # de API à toa (a segunda sempre veria "nada novo desde a última vez").
-    processar_feedback_pendente()
+    if TELEGRAM_HABILITADO:
+        processar_feedback_pendente()
 
     for perfil in perfis:
         print(f"\n{'=' * 50}")
@@ -488,7 +537,8 @@ def main():
     except BancoVazioSuspeito as e:
         logger.error(str(e))
         nomes = ", ".join(p.nome for p in perfis_selecionados)
-        enviar_mensagem(f"🛑 <b>JobRadar abortado</b>\n\nPerfis desta execução: {nomes}\n\n{e}")
+        if TELEGRAM_HABILITADO:
+            enviar_mensagem(f"🛑 <b>JobRadar abortado</b>\n\nPerfis desta execução: {nomes}\n\n{e}")
         sys.exit(1)
 
     if args.once:

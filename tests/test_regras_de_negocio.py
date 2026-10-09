@@ -137,8 +137,8 @@ def test_intl_remoto_sem_mercado_declarado_exige_idioma_no_titulo():
     ("Desenvolvedor Front-End Pleno", True),
     ("Desenvolvedor Frontend Sênior", True),
     ("Frontend Engineer", True),
-    ("Desenvolvedor Full Stack", True),
-    ("Engenheiro de Software", True),
+    ("Desenvolvedor Full Stack", False),
+    ("Engenheiro de Software", False),
     ("Desenvolvedor Angular", True),
     ("Desenvolvedor React", True),
     ("Angular Developer", True),
@@ -180,13 +180,30 @@ def test_vagas_com_ingles_obrigatorio_sao_rejeitadas(titulo):
 
 @pytest.mark.parametrize("titulo", [
     "Desenvolvedor Front-End Sênior",
-    "Desenvolvedor Full Stack Pleno",
     "Frontend Engineer",
     "Desenvolvedor Angular (Inglês Desejável)",
     "Desenvolvedor React - Diferencial Inglês",
-    "Desenvolvedor Node (Inglês Intermediário)",
+    "Frontend Developer (English intermediate)",
 ])
 def test_vagas_sem_ingles_obrigatorio_passam(titulo):
     """Vagas sem inglês obrigatório ou com inglês desejável continuam passando."""
     vaga = _vaga(titulo, "Remoto", "Remoto")
     assert vaga.combina_com(PERFIL_BR.regras)
+
+
+@pytest.mark.parametrize("titulo", [
+    "Backend Developer (React)",
+    "Frontend / Backend Engineer",
+    "Full Stack Frontend Developer",
+    "Node.js Developer",
+    "Software Engineer",
+])
+def test_vagas_backend_fullstack_ou_genericas_sao_rejeitadas(titulo):
+    vaga = _vaga(titulo, "Remoto", "Remoto")
+    assert not vaga.combina_com(PERFIL_BR.regras)
+
+
+def test_exigencia_de_ingles_na_descricao_e_rejeitada():
+    vaga = _vaga("Frontend Developer", "Remoto", "Remoto")
+    vaga.descricao = "Fluent English is required"
+    assert not vaga.combina_com(PERFIL_BR.regras)

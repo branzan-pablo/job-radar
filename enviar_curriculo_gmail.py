@@ -61,7 +61,7 @@ CAMINHO_CURRICULO = os.getenv(
 # Assunto do e-mail
 ASSUNTO = os.getenv(
     "CURRICULO_ASSUNTO",
-    "Apresentacao profissional - Pablo Ferreira | Engenheiro de Software Sênior",
+    "Front-End Sênior | Angular e React | Pablo Ferreira",
 )
 
 # Atraso em segundos entre envios (evita bloqueio por spam/rate-limit do Gmail)
@@ -73,31 +73,28 @@ ATRASO_ENTRE_ENVIOS = int(os.getenv("CURRICULO_ATRASO_SEGUNDOS", "8"))
 _modo_raw = os.getenv("CURRICULO_MODO_TESTE", "true").lower()
 MODO_TESTE = _modo_raw not in ("false", "0", "nao", "no")
 
-# Corpo do e-mail - use {empresa} como placeholder para o nome da empresa
+# Corpo do e-mail
+# Placeholders disponíveis:
+#   {empresa} - nome da empresa
 CORPO_TEMPLATE = os.getenv(
     "CURRICULO_CORPO",
     """\
-Ola, tudo bem?
+Olá, equipe da {empresa}! Tudo bem?
 
-Estava pesquisando empresas de tecnologia e conheci a {empresa}. Ao conhecer \
-um pouco mais sobre a empresa, achei interessante entrar em contato para \
-apresentar meu perfil profissional.
+Gostaria de apresentar meu perfil para oportunidades de Desenvolvedor Front-End Sênior em formato 100% remoto. \
 
-Sou desenvolvedor Full Stack Senior, com 12 anos de experiencia (9 focados \
-em front-end), especializado em Angular (NgRx, Signals, RxJS), arquitetura \
-de Micro Frontends com Module Federation e Node.js/NestJS. Tenho vivencia \
-no setor financeiro, com passagens por BTG Pactual, Itau (via NTT DATA) e \
-Fairfax Seguros.
+Tenho trajetória em desenvolvimento de software iniciada em 2013, com foco em Angular, React e TypeScript. \
+Atuo com Micro Frontends, modernização de aplicações e testes automatizados, com experiência em projetos para BTG Pactual, Itaú, Fairfax Seguros e Leroy Merlin.
 
-Gostaria de me colocar a disposicao para um bate-papo, caso exista alguma \
-oportunidade compativel com meu perfil, mesmo que nao haja uma vaga aberta \
-no momento.
+Minha experiência inclui desenvolvimento Full Stack com C#/.NET e projetos com Node.js/NestJS. Também utilizo IA para apoiar implementação, testes e revisão de código.
 
-Segue meu curriculo em anexo. Fico a disposicao para conversar melhor sobre \
-minha experiencia.
+Encaminho meu currículo em anexo. Caso tenham uma oportunidade compatível, fico à disposição para conversar sobre como posso contribuir com o time.
 
 Atenciosamente,
 Pablo Ferreira
+(17) 98828-2542
+https://www.linkedin.com/in/pabloferreirab
+https://github.com/branzan-pablo
 """,
 )
 
@@ -167,18 +164,15 @@ def montar_email(nome_empresa: str, email_destino: str, corpo: str, caminho_anex
     msg["Subject"] = ASSUNTO
     msg.set_content(corpo)
 
-    if caminho_anexo and os.path.exists(caminho_anexo):
-        with open(caminho_anexo, "rb") as f:
-            dados = f.read()
-        nome_arquivo = os.path.basename(caminho_anexo)
-        msg.add_attachment(
-            dados,
-            maintype="application",
-            subtype="pdf",
-            filename=nome_arquivo,
-        )
-    else:
-        print(f"  [AVISO] Curriculo nao encontrado em '{caminho_anexo}' - e-mail sem anexo.")
+    with open(caminho_anexo, "rb") as f:
+        dados = f.read()
+    nome_arquivo = os.path.basename(caminho_anexo)
+    msg.add_attachment(
+        dados,
+        maintype="application",
+        subtype="pdf",
+        filename=nome_arquivo,
+    )
 
     return msg
 
@@ -213,6 +207,11 @@ def enviar_curriculos(dry_run: bool = False):
         print("\n[DRY-RUN] Empresas que seriam contatadas:")
         for i, (nome, email) in enumerate(empresas, start=1):
             print(f"  {i:>3}. {nome} --> {email}")
+        return
+
+    if not os.path.isfile(CAMINHO_CURRICULO):
+        print(f"[ERRO] Curriculo PDF nao encontrado: {CAMINHO_CURRICULO}")
+        print("       Nenhum e-mail foi enviado.")
         return
 
     if not validar_credenciais():

@@ -3,6 +3,7 @@
 <!-- ![JobRadar](assets/cover.png) -->
 
 # 📡 JobRadar
+
 ### Monitor Automatizado de Vagas de Dados & BI
 
 ![Python](https://img.shields.io/badge/Python-3.11-3776AB?style=for-the-badge&logo=python&logoColor=white)
@@ -26,14 +27,14 @@
 
 Entre 07 e 15 de agosto, o sistema já processou **1.052 vagas únicas**, sem intervenção manual nenhuma — mas os números também expõem os riscos reais da arquitetura atual:
 
-| Achado | Número |
-|---|---|
-| 📊 Vagas processadas (deduplicadas) | **1.052** |
-| 🔗 Concentração numa única fonte (LinkedIn) | **89,5%** |
-| 🧪 Testes automatizados (CI a cada push) | **73** |
-| 🌎 Fontes monitoradas em paralelo | **8** |
-| ⏱️ Frequência de checagem | **a cada 3h** |
-| 💰 Custo de infraestrutura | **R$ 0** |
+| Achado                                      | Número        |
+| ------------------------------------------- | ------------- |
+| 📊 Vagas processadas (deduplicadas)         | **1.052**     |
+| 🔗 Concentração numa única fonte (LinkedIn) | **89,5%**     |
+| 🧪 Testes automatizados (CI a cada push)    | **73**        |
+| 🌎 Fontes monitoradas em paralelo           | **8**         |
+| ⏱️ Frequência de checagem                   | **a cada 3h** |
+| 💰 Custo de infraestrutura                  | **R$ 0**      |
 
 A concentração em LinkedIn é um risco medido, não ignorado: o endpoint usado não é oficial e o próprio código documenta a chance de bloqueio — por isso parte do trabalho recente foi medir o rendimento de cada fonte secundária e paginar mais fundo nelas, em vez de só empilhar fonte nova.
 
@@ -59,20 +60,20 @@ Vaga de alta relevância chega na hora, com motivo da aprovação, nível e link
 
 ## 🧭 Como funciona (pipeline)
 
-| Etapa | O que faz |
-|---|---|
-| **Busca** | Varre as fontes em paralelo, com rodízio de termos pra controlar custo por ciclo |
-| **Filtra** | Cargo (forte / ambíguo + qualificador / ferramenta + cargo), cidade ou mercado remoto, idioma |
-| **Pontua** | Score 0–10 por vaga: cargo, ferramenta, senioridade, mercado, idioma — soma de sinais, sem IA |
-| **Deduplica** | Por link e por empresa+título, pra pegar a mesma vaga republicada em fonte diferente |
-| **Notifica** | Alta relevância na hora; o resto num resumo diário ranqueado, melhor vaga no topo |
-| **Aprende** | Botão 👍/👎 em cada notificação — feedback vira dado pra medir precisão por fonte e por semana |
+| Etapa         | O que faz                                                                                      |
+| ------------- | ---------------------------------------------------------------------------------------------- |
+| **Busca**     | Varre as fontes em paralelo, com rodízio de termos pra controlar custo por ciclo               |
+| **Filtra**    | Cargo (forte / ambíguo + qualificador / ferramenta + cargo), cidade ou mercado remoto, idioma  |
+| **Pontua**    | Score 0–10 por vaga: cargo, ferramenta, senioridade, mercado, idioma — soma de sinais, sem IA  |
+| **Deduplica** | Por link e por empresa+título, pra pegar a mesma vaga republicada em fonte diferente           |
+| **Notifica**  | Alta relevância na hora; o resto num resumo diário ranqueado, melhor vaga no topo              |
+| **Aprende**   | Botão 👍/👎 em cada notificação — feedback vira dado pra medir precisão por fonte e por semana |
 
 ## 🏗️ Arquitetura técnica
 
-- **Filtro em 3 níveis de confiança:** cargo inequívoco passa sozinho; cargo ambíguo (ex: "Business Analyst") só conta com qualificador de dados junto no título; ferramenta (ex: "Power BI") só conta com palavra de cargo junto — nada aprova por palavra-chave solta.
+- **Filtro de vagas:** aceita apenas títulos identificados como Frontend/Front-End ou função de framework frontend; rejeita Backend, Full Stack e cargos genéricos, além de anúncios cujo título ou texto visível exija inglês obrigatório.
 - **Score de relevância sem ML:** 5 sinais conhecidos (cargo, ferramenta, senioridade, mercado, idioma), pesos calibrados contra o histórico real do banco, não chutados.
-- **Zero infraestrutura:** GitHub Actions como motor de cron, SQLite como banco — versionado no próprio Git, o histórico de vagas já vistas *é* o commit.
+- **Zero infraestrutura:** GitHub Actions como motor de cron, SQLite como banco — versionado no próprio Git, o histórico de vagas já vistas _é_ o commit.
 - **Resiliente:** nunca marca vaga como "vista" sem confirmar que a notificação saiu; alerta automático se metade das fontes falhar num ciclo; heartbeat diário confirmando que o robô ainda está de pé.
 - **73 testes automatizados em CI:** cada caso documenta um bug real já corrigido nesta base — não é cenário hipotético, é regressão registrada.
 
@@ -102,19 +103,91 @@ obradar/
 
 ## 💻 Como rodar
 
-```bash
+### 1) Preparar o ambiente
+
+```powershell
 git clone <repo>
-cd jobradar
-python -m venv venv && venv\Scripts\activate   # Linux/Mac: source venv/bin/activate
-pip install -r requirements.txt
+cd job-radar
+python -m venv venv
+.\venv\Scripts\Activate.ps1
+python -m pip install -r requirements.txt
 python -m playwright install chromium
 ```
 
-Criar `.env` na raiz com `TELEGRAM_BOT_TOKEN` e `TELEGRAM_CHAT_ID` (via [@BotFather](https://t.me/BotFather)), depois:
+Se `python` não estiver resolvendo para o ambiente virtual, use diretamente o executável do venv:
 
-```bash
-python main.py --perfil brasil internacional --once
+```powershell
+.\venv\Scripts\python.exe -m pip install -r requirements.txt
+.\venv\Scripts\python.exe -m playwright install chromium
 ```
+
+### 2) Rodar a busca local
+
+O Telegram está desligado por padrão. Quando ele não está habilitado, as vagas aprovadas são salvas localmente no banco SQLite em `data/jobs.db`, sem mandar mensagem para qualquer canal externo.
+
+Execução de um ciclo único:
+
+```powershell
+.\venv\Scripts\python.exe .\main.py --perfil brasil --once
+```
+
+Para buscar também o perfil internacional:
+
+```powershell
+.\venv\Scripts\python.exe .\main.py --perfil brasil internacional --once
+```
+
+Para deixar o script em loop automático, remova o parâmetro `--once`.
+
+### 3) Configurar o Telegram (opcional)
+
+Se quiser reativar o Telegram, crie um `.env` na raiz com:
+
+```env
+TELEGRAM_HABILITADO=true
+TELEGRAM_BOT_TOKEN=SEU_TOKEN
+TELEGRAM_CHAT_ID=SEU_CHAT_ID
+```
+
+O projeto usa `python-dotenv`, então o `.env` é lido automaticamente na inicialização.
+
+### 4) Enviar currículo por e-mail
+
+Este é um fluxo separado do monitoramento de vagas:
+
+- os contatos usados ficam em `data/empresas.txt`
+- as vagas encontradas não geram e-mail de candidato automaticamente
+- os endereços públicos encontrados em cards são adicionados automaticamente em `data/empresas.txt`
+- vagas sem e-mail ficam em `data/vagas_sem_email.csv`; para consulta, veja também `data/vagas_sem_email.md`, agrupado por site e com links clicáveis
+
+Antes do envio, copie o exemplo para o `.env` e configure Gmail:
+
+```env
+GMAIL_ENDERECO=seu_email@gmail.com
+GMAIL_SENHA_APP=sua_senha_de_app
+```
+
+Confirmação sem enviar:
+
+```powershell
+.\venv\Scripts\python.exe .\enviar_curriculo_gmail.py --dry-run
+```
+
+Envio real com confirmação por empresa:
+
+```powershell
+.\venv\Scripts\python.exe .\enviar_curriculo_gmail.py
+```
+
+> O arquivo do currículo deve existir em `data/Curriculo-Pablo-Ferreira.pdf` ou você pode apontar outro PDF com `--curriculo`.
+
+## 🧪 Testes
+
+```powershell
+.\venv\Scripts\python.exe -m pytest tests/ -v
+```
+
+Os testes cobrem regras de filtro, banco, notificações e a lógica de coleta de contatos.
 
 ## 🧪 Testes
 
@@ -128,6 +201,6 @@ pytest tests/ -v
 
 <div align="center">
 
-*Case de portfólio em automação de dados — Python, Playwright, SQLite, GitHub Actions e engenharia de filtro sem ML.*
+_Case de portfólio em automação de dados — Python, Playwright, SQLite, GitHub Actions e engenharia de filtro sem ML._
 
 </div>

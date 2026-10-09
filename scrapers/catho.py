@@ -4,6 +4,7 @@ import time
 from playwright.sync_api import sync_playwright
 
 from core.job import Job, _e_remoto, _normalizar, extrair_data_publicacao
+from utils.contatos_vagas import extrair_emails_publicos
 from core.logger import get_logger
 from scrapers.base import BaseScraper
 
@@ -105,6 +106,8 @@ class CathoScraper(BaseScraper):
                             local=local,
                             link=link,
                             site="Catho",
+                                                        emails_candidatura=extrair_emails_publicos(card.inner_text()),
+                            descricao=card.inner_text(),
                             publicado_em=publicado_em,
                             modalidade=modalidade,
                         ))

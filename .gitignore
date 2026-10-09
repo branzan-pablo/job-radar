@@ -10,4 +10,5 @@ __pycache__/
 data/*.db-journal
 data/*.db-wal
 data/*.db-shm
+data/vagas_sem_email.csv
 _to_delete/

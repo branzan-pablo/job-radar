@@ -28,6 +28,7 @@ from datetime import date
 import requests
 
 from core.job import Job
+from utils.contatos_vagas import extrair_emails_publicos
 from core.logger import get_logger
 from scrapers.base import BaseScraper
 
@@ -125,6 +126,8 @@ def montar_job(item: dict, hoje: date | None = None) -> Job | None:
         local=_local(vaga.get("localization")),
         link=f"{URL_VAGA}{id_vaga}",
         site="Senior",
+            emails_candidatura=extrair_emails_publicos(str(vaga)),
+        descricao=str(vaga),
         publicado_em=str((vaga.get("publication") or {}).get("startDate") or ""),
         modalidade=_modalidade(vaga.get("jobModel")),
     )

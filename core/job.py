@@ -1041,6 +1041,32 @@ def exige_ingles_obrigatorio(texto: str) -> bool:
     return _REGEX_INGLES_OBRIGATORIO.search(texto_norm) is not None
 
 
+_TERMOS_BACKEND = ("backend", "back-end", "back end", "fullstack", "full-stack", "full stack")
+_TERMOS_FRONTEND = ("frontend", "front-end", "front end")
+_FRAMEWORKS_FRONTEND = ("angular", "react", "vue", "next.js", "nextjs", "nuxt", "nuxtjs")
+_CARGOS_DESENVOLVIMENTO = (
+    "developer", "engineer", "desenvolvedor", "desenvolvedora", "engenheiro",
+    "engenheira", "programador", "programadora", "specialist", "especialista",
+    "tech lead", "lider tecnico", "líder técnico", "senior", "sênior", "junior",
+    "júnior", "pleno", "staff", "principal", "mid-level", "mid level",
+)
+
+
+def _eh_vaga_frontend(titulo: str) -> bool:
+    titulo_norm = _normalizar(titulo)
+    if any(_contem_termo(_normalizar(termo), titulo_norm) for termo in _TERMOS_BACKEND):
+        return False
+    if any(_contem_termo(_normalizar(termo), titulo_norm) for termo in _TERMOS_FRONTEND):
+        return True
+    tem_framework_frontend = any(
+        _contem_termo(_normalizar(termo), titulo_norm) for termo in _FRAMEWORKS_FRONTEND
+    )
+    tem_cargo = any(
+        _contem_termo(_normalizar(termo), titulo_norm) for termo in _CARGOS_DESENVOLVIMENTO
+    )
+    return tem_framework_frontend and tem_cargo
+
+
 @dataclass
 class Job:
     titulo: str
@@ -1052,6 +1078,7 @@ class Job:
     modalidade: str = ""
     escopo_indefinido: bool = False
     descricao: str = ""
+    emails_candidatura: tuple[str, ...] = ()
     relevancia: int = 0
     motivo: str = ""
     # MEDIDO: WeWorkRemotelyIntlScraper preenche `local` com a SEDE da
@@ -1216,7 +1243,19 @@ class Job:
         """Faz a conta completa uma vez só — combina_com() e
         pontuar_relevancia() leem o mesmo resultado, em vez de cada um
         recalcular por conta própria (ver MEDIDO em _Avaliacao)."""
-        # Rejeita imediatamente vagas que pedem inglês obrigatório
+        # Só considera vagas Frontend puras e sem exigência obrigatória de inglês.
+        if not _eh_vaga_frontend(self.titulo):
+            return _Avaliacao(
+                aprovada=False,
+                bate_forte=False,
+                bate_ambiguo=False,
+                bate_ferramenta=False,
+                bate_remoto=False,
+                escopos=set(),
+                mercado_confirmado=False,
+                idioma_bateu_titulo=False,
+            )
+
         if exige_ingles_obrigatorio(self.titulo) or exige_ingles_obrigatorio(self.descricao):
             return _Avaliacao(
                 aprovada=False,
